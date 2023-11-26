@@ -44,8 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     // todo: Dạnh sách URL api dùng để khi cần phân quyền
     private static final String[] AUTH_WHITELIST = {
-            "/api/**",
-            "/api/**",
+            "/api/abc/**",
+            "/api/test/**",
     };
 
     @Override
@@ -54,7 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/api/**").permitAll()  // với permitAll Cho phép tất cả mọi người truy cập vào web
+                .antMatchers("/api/export/order/**").permitAll()  // với permitAll Cho phép tất cả mọi người truy cập vào web
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .antMatchers("/ws/**").permitAll()
                 .anyRequest().authenticated(); // Tất cả các request khác đều cần phải xác thực mới được
