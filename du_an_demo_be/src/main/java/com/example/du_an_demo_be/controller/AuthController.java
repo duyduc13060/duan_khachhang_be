@@ -6,6 +6,7 @@ import com.example.du_an_demo_be.payload.response.DefaultResponse;
 import com.example.du_an_demo_be.payload.response.LoginResponse;
 import com.example.du_an_demo_be.payload.response.SampleResponse;
 import com.example.du_an_demo_be.security.CustomerDetailService;
+import com.example.du_an_demo_be.security.jwt.JwtProvider;
 import com.example.du_an_demo_be.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,8 +25,8 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
-
     private final AuthService authService;
+    private final JwtProvider jwtProvider;
 
 
     //  todo: API này dùng để đăng ký tài khoản
@@ -45,7 +46,10 @@ public class AuthController {
                 )
         );
 
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        // tạo token bằng thông tin username khi login
+        String token = jwtProvider.createToken(authentication);
         CustomerDetailService customerDetailService = (CustomerDetailService) authentication.getPrincipal();
 
         return ResponseEntity.ok(
@@ -54,6 +58,7 @@ public class AuthController {
                         .success(true)
                         .message("Login success")
                         .data(new LoginResponse(
+                                token,
                                 customerDetailService.getFullname(),
                                 customerDetailService.getAuthorities(),
                                 customerDetailService.getUsername(),

@@ -11,13 +11,15 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginResponse {
+    private String token;
     private Long id;
     private String fullname;
     private String username;
     private String phone;
     private Collection<? extends GrantedAuthority> role;
 
-    public LoginResponse(String fullname,Collection<? extends GrantedAuthority> authorities, String username, Long id, String phone) {
+    public LoginResponse(String token, String fullname,Collection<? extends GrantedAuthority> authorities, String username, Long id, String phone) {
+        this.token = token;
         this.fullname = fullname;
         this.role  = authorities;
         this.username = username;

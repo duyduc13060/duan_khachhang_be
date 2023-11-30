@@ -17,6 +17,8 @@ public class UserRegister {
     @Size(min = 1,max = 50,message = "Fullname length from 1 to 50")
     private String fullname;
 
+    private String phone;
+
     @NotBlank(message = "Password is not empty")
     @Size(min = 1,max = 50,message = "Password length from 1 to 50")
     private String password;

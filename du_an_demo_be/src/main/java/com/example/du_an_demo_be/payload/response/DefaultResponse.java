@@ -2,11 +2,15 @@ package com.example.du_an_demo_be.payload.response;
 
 import com.example.du_an_demo_be.contants.ResponseStatusContants;
 import com.example.du_an_demo_be.exception.ProjectException;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class DefaultResponse<T>{
 
     private Integer success;
@@ -44,6 +48,14 @@ public class DefaultResponse<T>{
         DefaultResponse<T> response = new DefaultResponse<>();
         response.setSuccess(e.getCode());
         response.setMessage(e.getMessage());
+        return response;
+    }
+
+    public static <T> DefaultResponse <T> error(String message, Integer success, T body){
+        DefaultResponse<T> response = new DefaultResponse<>();
+        response.setSuccess(success);
+        response.setMessage(message);
+        response.setData(body);
         return response;
     }
 
