@@ -20,7 +20,6 @@ public class UserController {
         return ResponseEntity.ok().body(userService.getListUser());
     }
 
-
     @PostMapping("/search")
     public ResponseEntity<DefaultResponse<?>> search(
             @RequestBody UserDto userDto
@@ -28,8 +27,33 @@ public class UserController {
         return ResponseEntity.ok().body(userService.search(userDto));
     }
 
+    @PostMapping("/create/user")
+    public ResponseEntity<DefaultResponse<?>> createUser(
+            @RequestBody UserDto userDto
+    ){
+        return ResponseEntity.ok().body(userService.createUser(userDto));
+    }
 
+    @PutMapping("/update/user")
+    public ResponseEntity<DefaultResponse<?>> updateUser(
+            @RequestBody UserDto userDto
+    ){
+        return ResponseEntity.ok().body(userService.updateUser(userDto));
+    }
 
+    @DeleteMapping("/delete/user/{id}")
+    public ResponseEntity<DefaultResponse<?>> deleteUser(
+            @PathVariable("id") Long idUser
+    ){
+        return ResponseEntity.ok().body(userService.deleteUser(idUser));
+    }
+
+    @GetMapping("/detail/user/{id}")
+    public ResponseEntity<DefaultResponse<?>> viewDetailUser(
+            @PathVariable("id") Long idUser
+    ){
+        return ResponseEntity.ok().body(userService.viewDetailUser(idUser));
+    }
 
 
 }

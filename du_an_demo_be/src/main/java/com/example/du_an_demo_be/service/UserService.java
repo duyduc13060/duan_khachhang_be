@@ -10,4 +10,12 @@ public interface UserService {
     DefaultResponse<?> getListUser();
 
     DefaultResponse<List<UserDto>> search(UserDto userDto);
+
+    DefaultResponse<?> createUser(UserDto userDto);
+
+    DefaultResponse<?> updateUser(UserDto userDto);
+
+    DefaultResponse<?> deleteUser(Long userId);
+
+    DefaultResponse<?> viewDetailUser(Long userId);
 }

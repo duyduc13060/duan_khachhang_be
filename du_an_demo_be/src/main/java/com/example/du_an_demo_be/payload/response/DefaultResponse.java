@@ -51,7 +51,7 @@ public class DefaultResponse<T>{
         return response;
     }
 
-    public static <T> DefaultResponse <T> error(String message, Integer success, T body){
+    public static <T> DefaultResponse <T> error(Integer success,String message, T body){
         DefaultResponse<T> response = new DefaultResponse<>();
         response.setSuccess(success);
         response.setMessage(message);

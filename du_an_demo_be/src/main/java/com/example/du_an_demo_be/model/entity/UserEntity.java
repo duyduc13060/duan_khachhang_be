@@ -1,6 +1,7 @@
 package com.example.du_an_demo_be.model.entity;
 
 import com.example.du_an_demo_be.contants.RoleEnum;
+import com.example.du_an_demo_be.contants.StatusUser;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -19,7 +20,7 @@ public class UserEntity {
     @Column(name = "fullname")
     private String fullname;
 
-    @Column(name = "username" , unique = true, nullable = false)
+    @Column(name = "username")
     private String username;
 
     @Column(name = "password")
@@ -28,6 +29,9 @@ public class UserEntity {
     @Column(name = "phone")
     private String phone;
 
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "create_date")
     @CreationTimestamp
     private LocalDateTime createDate;
@@ -35,6 +39,8 @@ public class UserEntity {
     @Column(name = "address")
     private String address;
 
-    private RoleEnum role;
+    private Integer status;
+
+    private Integer role;
 
 }

@@ -14,5 +14,8 @@ public class UserDto {
     private String phone;
     private LocalDateTime createDate;
     private String address;
+    private String email;
     private Integer role;
+    private Integer status;
+    private String keySearch;
 }

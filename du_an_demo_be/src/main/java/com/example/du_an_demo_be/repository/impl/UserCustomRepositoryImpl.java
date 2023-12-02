@@ -31,15 +31,18 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 "   u.fullname,\n" +
                 "   u.phone,\n" +
                 "   u.`role`,\n" +
-                "   u.username\n" +
+                "   u.username,\n" +
+                "   u.status,\n" +
+                "   u.email\n" +
                 "FROM users u\n" +
-                "where ((1 = 1  \n" +
-                "AND ( :username is null OR u.username = :username) \n" +
-                "AND ( :fullname IS NULL OR u.fullname like(:fullname) escape '&' OR u.fullname like(:fullname) escape '&')))");
+                "where (\t(1 = 1  \n" +
+                "\t\tAND ( :status is null or u.status = :status)\n" +
+                "\t\tAND ( :keySearch is null or u.username like CONCAT('%', :keySearch, '%') OR u.fullname like CONCAT('%', :keySearch, '%'))\t\t\n" +
+                "))");
 
         Query query = entityManager.createNativeQuery(sql.toString());
-        query.setParameter("username", userDto.getUsername());
-        query.setParameter("fullname", userDto.getFullname());
+        query.setParameter("status", userDto.getStatus());
+        query.setParameter("keySearch", userDto.getKeySearch());
 
         List<UserDto> userDtoList = new ArrayList<>();
         List<Object[]> objects = query.getResultList();
@@ -54,6 +57,8 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 userDto1.setPhone(DataUtil.safeToString(obj[4]));
                 userDto1.setRole(DataUtil.safeToInt(obj[5]));
                 userDto1.setUsername(DataUtil.safeToString(obj[6]));
+                userDto1.setStatus(DataUtil.safeToInt(obj[7]));
+                userDto1.setEmail(DataUtil.safeToString(obj[8]));
                 userDtoList.add(userDto1);
             }
         }
