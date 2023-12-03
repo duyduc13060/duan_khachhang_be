@@ -29,7 +29,7 @@ public class CustomerDetailService implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
 
     public static CustomerDetailService build(UserEntity userEntity){
-        List<GrantedAuthority> authorities =  Arrays.asList(new SimpleGrantedAuthority(userEntity.getRole().toString()));
+        List<GrantedAuthority> authorities =  Arrays.asList(new SimpleGrantedAuthority(userEntity.getRoleId().toString()));
         return CustomerDetailService.builder()
                 .id(userEntity.getId())
                 .fullname(userEntity.getFullname())

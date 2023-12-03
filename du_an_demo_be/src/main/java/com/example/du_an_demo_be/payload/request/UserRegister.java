@@ -9,18 +9,14 @@ import javax.validation.constraints.Size;
 @Data
 public class UserRegister {
 
-    @NotBlank(message = "Username is not empty")
-    @Size(min = 1,max = 20,message = "Username length from 1 to 20")
     private String username;
 
-    @NotBlank(message = "Fullname is not empty")
-    @Size(min = 1,max = 50,message = "Fullname length from 1 to 50")
     private String fullname;
 
     private String phone;
 
-    @NotBlank(message = "Password is not empty")
-    @Size(min = 1,max = 50,message = "Password length from 1 to 50")
+    private String email;
+
     private String password;
 
 }

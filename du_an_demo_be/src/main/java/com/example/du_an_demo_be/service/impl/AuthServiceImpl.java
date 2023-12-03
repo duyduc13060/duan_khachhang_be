@@ -29,26 +29,36 @@ public class AuthServiceImpl implements AuthService {
 
     // todo: hàm này dùng để đăng ký tài khoản
     @Override
-    public UserRegister registerAccount(UserRegister userRegister){
+    public DefaultResponse<UserRegister> registerAccount(UserRegister userRegister){
 
-        // todo: tìm kiếm username có tồn tại trong database không -> nếu không return null cái này có thể trả ra message cụ thể cũng được
-        this.validateRegister(userRegister);
+        DefaultResponse<UserRegister> response = this.validateRegister(userRegister);
+        if(response.getSuccess() != 200){
+            return response;
+        }
 
         UserEntity userEntity = modelMapper.map(userRegister, UserEntity.class);
-        userEntity.setUsername(userRegister.getUsername());
-        userEntity.setFullname(userRegister.getFullname());
         userEntity.setPassword(passwordEncoder.encode(userRegister.getPassword()));
-        userEntity.setRole(0);
+        userEntity.setRoleId(2L);
 
         userRegister = modelMapper.map(userRepository.save(userEntity),UserRegister.class);
 
-        return userRegister;
+        response.setData(userRegister);
+
+        return response;
     }
 
 
-    private DefaultResponse<?> validateRegister(UserRegister userRegister){
+    private DefaultResponse<UserRegister> validateRegister(UserRegister userRegister){
 
         DefaultResponse<UserRegister> response = new DefaultResponse<>();
+
+        Optional<UserEntity> findByUserName = userRepository.findByUsername(userRegister.getUsername());
+        if(findByUserName.isPresent()){
+            response.setSuccess(HttpStatus.NOT_FOUND.value());
+            response.setMessage("username đã tồn tại bạn !!!");
+            response.setData(null);
+            return response;
+        }
 
         if(Objects.isNull(userRegister.getUsername())){
             response.setSuccess(HttpStatus.NOT_FOUND.value());
@@ -57,9 +67,31 @@ public class AuthServiceImpl implements AuthService {
             return response;
         }
 
+        if(userRegister.getUsername().length() > 15){
+            response.setSuccess(HttpStatus.NOT_FOUND.value());
+            response.setMessage("username không được vượt quá 15 ký tự");
+            response.setData(null);
+            return response;
+        }
+
+
         if(Objects.isNull(userRegister.getFullname())){
             response.setSuccess(HttpStatus.NOT_FOUND.value());
             response.setMessage("fullname không được để trống");
+            response.setData(null);
+            return response;
+        }
+
+        if(userRegister.getFullname().length() > 100){
+            response.setSuccess(HttpStatus.NOT_FOUND.value());
+            response.setMessage("fullname không được vượt quá 100 ký tự");
+            response.setData(null);
+            return response;
+        }
+
+        if(Objects.isNull(userRegister.getEmail())){
+            response.setSuccess(HttpStatus.NOT_FOUND.value());
+            response.setMessage("Email không được để trống");
             response.setData(null);
             return response;
         }

@@ -41,6 +41,6 @@ public class UserEntity {
 
     private Integer status;
 
-    private Integer role;
+    private Long roleId;
 
 }

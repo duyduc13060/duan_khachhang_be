@@ -31,9 +31,8 @@ public class AuthController {
 
     //  todo: API này dùng để đăng ký tài khoản
     @PostMapping("/signup")
-    public ResponseEntity<?> registerAccount(@RequestBody UserRegister userRegister){
-        return ResponseEntity.ok(
-                DefaultResponse.success(authService.registerAccount(userRegister)));
+    public ResponseEntity<DefaultResponse<UserRegister>> registerAccount(@RequestBody UserRegister userRegister){
+        return ResponseEntity.ok().body(authService.registerAccount(userRegister));
     }
 
     // todo: API này dùng để login

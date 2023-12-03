@@ -152,34 +152,34 @@ public class UserServiceImpl implements UserService {
     }
 
 
-//    public static void main(String[] args) {
-//        OkHttpClient client = new OkHttpClient();
-//
-//        MediaType mediaType = MediaType.parse("application/json");
-//        RequestBody body = RequestBody.create(mediaType, "{\"model\":\"mistral-7b-instruct\",\"messages\":[{\"role\":\"system\",\"content\":\"Be precise and concise.\"},{\"role\":\"assistant\",\"content\":\"How many stars are there in our galaxy?\"}]}");
-//
-//        Request request = new Request.Builder()
-//                .url("https://api.perplexity.ai/chat/completions")
-//                .post(body)
-//                .addHeader("accept", "application/json")
-//                .addHeader("content-type", "application/json")
-//                .addHeader("authorization", "Bearer d681a048-4454-4bb5-b186-59ad3d9023b4")
-//                .build();
-//
-//        try {
-//            Response response = client.newCall(request).execute();
-//            if (response.isSuccessful()) {
-//                // Xử lý dữ liệu response ở đây
-//                String responseBody = response.body().string();
-//                System.out.println("Response: " + responseBody);
-//            } else {
-//                // Xử lý khi response không thành công
-//                System.err.println("Error: " + response.code() + " - " + response.message());
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    public static void main(String[] args) {
+        OkHttpClient client = new OkHttpClient();
+
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(mediaType, "{\"model\":\"mistral-7b-instruct\",\"messages\":[{\"role\":\"system\",\"content\":\"Be precise and concise.\"},{\"role\":\"user\",\"content\":\"How many stars are there in our galaxy?\"}]}");
+
+        Request request = new Request.Builder()
+                .url("https://api.perplexity.ai/chat/completions")
+                .post(body)
+                .addHeader("accept", "application/json")
+                .addHeader("content-type", "application/json")
+                .addHeader("authorization", "Bearer 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")
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful()) {
+                // Xử lý dữ liệu response ở đây
+                String responseBody = response.body().string();
+                System.out.println("Response: " + responseBody);
+            } else {
+                // Xử lý khi response không thành công
+                System.err.println("Error: " + response.code() + " - " + response.message());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
 

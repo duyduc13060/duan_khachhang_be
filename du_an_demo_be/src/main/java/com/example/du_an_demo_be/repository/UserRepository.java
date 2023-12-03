@@ -27,4 +27,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             "AND ( :fullname IS NULL OR u.fullname like(:fullname) escape '&' OR u.fullname like(:fullname) escape '&')))", nativeQuery = true)
     List<UserEntity> searchUser(String username, String fullname);
 
+    List<UserEntity> findByRoleId(Long roleId);
+
 }
