@@ -15,8 +15,13 @@ public class MessageController {
 
     private final MessageService messageService;
 
+    @GetMapping("/get-message")
+    public ResponseEntity<?> getMessage(){
+        return ResponseEntity.ok().body(messageService.getListMessage());
+    }
+
     @PostMapping("/generate-message")
-    public ResponseEntity<?> login(@RequestBody ChatBoxRequest chatBoxRequest){
+    public ResponseEntity<?> sendMessage(@RequestBody ChatBoxRequest chatBoxRequest){
        return   ResponseEntity.ok().body(messageService.saveMessage(chatBoxRequest));
     }
 

@@ -15,9 +15,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,12 +29,25 @@ public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
     private final ChatBoxService chatBoxService;
+    private final ModelMapper modelMapper;
 
     @Value("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")
     public String tokenCompletions;
 
     @Value("https://api.perplexity.ai/chat/completions")
     public String apiChatBox;
+
+
+
+    @Override
+    public List<MessageDto> getListMessage(){
+        List<MessageDto> messageDtoList = messageRepository.findAll()
+                .stream()
+                .map(e -> modelMapper.map(e, MessageDto.class))
+                .collect(Collectors.toList());
+
+        return messageDtoList;
+    }
 
 
     @Override
@@ -55,6 +72,7 @@ public class MessageServiceImpl implements MessageService {
             for (ChatBoxResponse.Choices message : chatBoxResponse.getChoices()) {
                 MessageEntity messageEntity = MessageEntity.builder()
                         .contentResponse(message.getMessage().getContent())
+                        .contentRequest(chatBoxRequest.getMessages().get(1).getContent())
                         .model(chatBoxResponse.getModel())
                         .completionsId(chatBoxResponse.getId())
                         .roleChoices(message.getMessage().getRole())

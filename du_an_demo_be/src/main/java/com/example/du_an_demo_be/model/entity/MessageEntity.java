@@ -28,7 +28,7 @@ public class MessageEntity {
     @Column(name = "content_request")
     private String contentRequest;
 
-    @Column(name = "content_reponse")
+    @Column(name = "content_reponse",  columnDefinition = "VARCHAR(500)")
     private String contentResponse;
 
     private String model;

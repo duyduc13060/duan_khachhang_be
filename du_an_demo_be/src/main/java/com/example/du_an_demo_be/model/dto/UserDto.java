@@ -15,7 +15,7 @@ public class UserDto {
     private LocalDateTime createDate;
     private String address;
     private String email;
-    private Integer role;
+    private Long roleId;
     private Integer status;
     private String keySearch;
 }

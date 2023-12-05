@@ -55,7 +55,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 userDto1.setCreateDate(DataUtil.safeToLocalDateTime(obj[2]));
                 userDto1.setFullname(DataUtil.safeToString(obj[3]));
                 userDto1.setPhone(DataUtil.safeToString(obj[4]));
-                userDto1.setRole(DataUtil.safeToInt(obj[5]));
+                userDto1.setRoleId(DataUtil.safeToLong(obj[5]));
                 userDto1.setUsername(DataUtil.safeToString(obj[6]));
                 userDto1.setStatus(DataUtil.safeToInt(obj[7]));
                 userDto1.setEmail(DataUtil.safeToString(obj[8]));
