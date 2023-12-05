@@ -6,6 +6,5 @@ import org.json.JSONObject;
 @Data
 public class ResultApiChatBox {
     private JSONObject jsonObject;
-
     private String jsonObjectString;
 }

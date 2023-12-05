@@ -16,9 +16,9 @@ public class ChatBoxController {
 
     private final ChatBoxService chatBoxService;
 
-    @PostMapping("/generate")
-    public ResponseEntity<?> login(@RequestBody ChatBoxRequest chatBoxRequest){
-       return   ResponseEntity.ok().body(chatBoxService.chatBox(chatBoxRequest));
-    }
+//    @PostMapping("/generate")
+//    public ResponseEntity<?> login(@RequestBody ChatBoxRequest chatBoxRequest){
+//       return   ResponseEntity.ok().body(chatBoxService.chatBox(chatBoxRequest));
+//    }
 
 }

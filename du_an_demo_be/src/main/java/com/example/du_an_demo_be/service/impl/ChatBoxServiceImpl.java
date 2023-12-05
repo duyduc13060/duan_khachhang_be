@@ -16,43 +16,9 @@ import java.util.Objects;
 @Service
 public class ChatBoxServiceImpl implements ChatBoxService {
 
-    @Value("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")
-    public String token;
-
-    @Value("https://api.perplexity.ai/chat/completions")
-    public String apiChatBox;
-
-
-
-
-//    public static void main(String[] args) {
-//
-//        ChatBoxRequest.Messages messages = new ChatBoxRequest.Messages();
-//        messages.setRole("system");
-//        messages.setContent("Be precise and concise.");
-//
-//        ChatBoxRequest.Messages messages1 = new ChatBoxRequest.Messages();
-//        messages1.setRole("user");
-//        messages1.setContent("trong java spring boot có bảo mật không ?");
-//
-//        List<ChatBoxRequest.Messages> messages2 = new ArrayList<>();
-//        messages2.add(messages);
-//        messages2.add(messages1);
-//
-//
-//        ChatBoxRequest chatBoxRequest = ChatBoxRequest.builder()
-//                .model("mistral-7b-instruct")
-//                .messages(messages2)
-//                .build();
-//
-//
-//        HttpEntity<Object> requestEntity = new HttpEntity<>(chatBoxRequest);
-//
-//        chatBox(requestEntity);
-//    }
 
     @Override
-    public DefaultResponse<ResultApiChatBox> chatBox(ChatBoxRequest chatBoxRequest){
+    public DefaultResponse<ResultApiChatBox> chatBox(ChatBoxRequest chatBoxRequest, String api, String token){
 
         DefaultResponse<ResultApiChatBox> resultApiChatBoxDefaultResponse = new DefaultResponse<>();
         ResultApiChatBox resultApiChatBox = new ResultApiChatBox();
@@ -64,7 +30,7 @@ public class ChatBoxServiceImpl implements ChatBoxService {
         RequestBody body = RequestBody.create(mediaType, new Gson().toJson(chatBoxRequest));
 
         Request request = new Request.Builder()
-                .url(apiChatBox)
+                .url(api)
                 .post(body)
                 .addHeader("accept", "application/json")
                 .addHeader("content-type", "application/json")
@@ -83,6 +49,7 @@ public class ChatBoxServiceImpl implements ChatBoxService {
             resultApiChatBoxDefaultResponse.setSuccess(HttpStatus.BAD_REQUEST.value());
         }
 
+        resultApiChatBoxDefaultResponse.setSuccess(HttpStatus.OK.value());
         resultApiChatBoxDefaultResponse.setData(resultApiChatBox);
 
         return resultApiChatBoxDefaultResponse;
