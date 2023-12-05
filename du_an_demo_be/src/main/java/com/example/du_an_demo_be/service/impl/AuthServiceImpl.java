@@ -39,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
         UserEntity userEntity = modelMapper.map(userRegister, UserEntity.class);
         userEntity.setPassword(passwordEncoder.encode(userRegister.getPassword()));
         userEntity.setRoleId(2L);
+        userEntity.setStatus(1);
 
         userRegister = modelMapper.map(userRepository.save(userEntity),UserRegister.class);
 

@@ -1,9 +1,13 @@
 package com.example.du_an_demo_be.security;
 
+import com.example.du_an_demo_be.exception.NotFoundException;
+import com.example.du_an_demo_be.model.entity.RoleEntity;
 import com.example.du_an_demo_be.model.entity.UserEntity;
+import com.example.du_an_demo_be.repository.RoleRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,15 +15,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @AllArgsConstructor
 @Builder
+@RequiredArgsConstructor
 public class CustomerDetailService implements UserDetails {
 
     // todo:  đối tượng UserDetails để chứa toàn bộ thông tin về người dùng
     //       tạo ra một class mới giúp chuyển các thông tin của User thành UserDetails
-
     private Long id;
     private String fullname;
     private String username;
