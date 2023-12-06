@@ -6,7 +6,9 @@ import com.example.du_an_demo_be.model.entity.UserEntity;
 import com.example.du_an_demo_be.payload.response.DefaultResponse;
 import com.example.du_an_demo_be.repository.UserCustomRepository;
 import com.example.du_an_demo_be.repository.UserRepository;
+import com.example.du_an_demo_be.security.CustomerDetailService;
 import com.example.du_an_demo_be.service.UserService;
+import com.example.du_an_demo_be.until.CurrentUserUtils;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.modelmapper.ModelMapper;
@@ -85,7 +87,14 @@ public class UserServiceImpl implements UserService {
         if(findById == null){
             throw new BadRequestException("Id not found" + userDto.getId());
         }
-        findById = modelMapper.map(userDto, UserEntity.class);
+        findById.setPassword(findById.getPassword());
+        findById.setCreateDate(findById.getCreateDate());
+        findById.setUsername(userDto.getUsername());
+        findById.setFullname(userDto.getFullname());
+        findById.setPhone(userDto.getPhone());
+        findById.setEmail(userDto.getEmail());
+        findById.setRoleId(userDto.getRoleId());
+        findById.setStatus(userDto.getStatus());
 
         this.userRepository.save(findById);
 
@@ -100,13 +109,24 @@ public class UserServiceImpl implements UserService {
     public DefaultResponse<?> deleteUser(Long userId){
         DefaultResponse<UserDto> response = new DefaultResponse<>();
 
+        CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
+
         UserEntity findById = this.userRepository.getById(userId);
         if(findById == null){
             throw new BadRequestException("Id not dfound" + userId);
         }
 
+        Optional<UserEntity> fUserEntity = userRepository.findByUsername(customerDetailService.getUsername());
+
+        if(fUserEntity.get().getUsername().equals(findById.getUsername())){
+            response.setMessage("Không được xóa chính mình");
+            response.setSuccess(HttpStatus.BAD_REQUEST.value());
+            return response;
+        }
+
         userRepository.deleteById(findById.getId());
         response.setMessage("Xóa user thành công");
+        response.setSuccess(HttpStatus.OK.value());
         return response;
     }
 

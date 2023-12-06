@@ -29,4 +29,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     List<UserEntity> findByRoleId(Long roleId);
 
+
+
 }

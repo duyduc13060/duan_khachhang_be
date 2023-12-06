@@ -27,10 +27,10 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
         StringBuilder sql = new StringBuilder("SELECT \n" +
                 "   u.id,\n" +
                 "   u.address,\n" +
-                "   u.create_date createDate,\n" +
+                "   u.create_date as createDate,\n" +
                 "   u.fullname,\n" +
                 "   u.phone,\n" +
-                "   u.`role`,\n" +
+                "   u.role_id as roleId,\n" +
                 "   u.username,\n" +
                 "   u.status,\n" +
                 "   u.email\n" +

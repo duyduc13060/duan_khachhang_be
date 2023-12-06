@@ -16,12 +16,12 @@ public class LoginResponse {
     private String fullname;
     private String username;
     private String phone;
-    private Collection<? extends GrantedAuthority> role;
+    private String role;
 
-    public LoginResponse(String token, String fullname,Collection<? extends GrantedAuthority> authorities, String username, Long id, String phone) {
+    public LoginResponse(String token, String fullname,String role, String username, Long id, String phone) {
         this.token = token;
         this.fullname = fullname;
-        this.role  = authorities;
+        this.role  = role;
         this.username = username;
         this.id = id;
         this.phone = phone;

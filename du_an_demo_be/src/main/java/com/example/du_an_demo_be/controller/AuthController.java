@@ -1,10 +1,15 @@
 package com.example.du_an_demo_be.controller;
 
+import com.example.du_an_demo_be.exception.NotFoundException;
+import com.example.du_an_demo_be.model.entity.RoleEntity;
+import com.example.du_an_demo_be.model.entity.UserEntity;
 import com.example.du_an_demo_be.payload.request.LoginRequest;
 import com.example.du_an_demo_be.payload.request.UserRegister;
 import com.example.du_an_demo_be.payload.response.DefaultResponse;
 import com.example.du_an_demo_be.payload.response.LoginResponse;
 import com.example.du_an_demo_be.payload.response.SampleResponse;
+import com.example.du_an_demo_be.repository.RoleRepository;
+import com.example.du_an_demo_be.repository.UserRepository;
 import com.example.du_an_demo_be.security.CustomerDetailService;
 import com.example.du_an_demo_be.security.jwt.JwtProvider;
 import com.example.du_an_demo_be.service.AuthService;
@@ -14,9 +19,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
+import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -27,6 +37,8 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final AuthService authService;
     private final JwtProvider jwtProvider;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
 
     //  todo: API này dùng để đăng ký tài khoản
@@ -51,6 +63,13 @@ public class AuthController {
         String token = jwtProvider.createToken(authentication);
         CustomerDetailService customerDetailService = (CustomerDetailService) authentication.getPrincipal();
 
+
+        UserEntity userEntity = userRepository.findByUsername(customerDetailService.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found"));
+
+        RoleEntity roleEntity = roleRepository.findById(userEntity.getRoleId())
+                .orElseThrow(() -> new UsernameNotFoundException("Role name not found"));
+
         return ResponseEntity.ok(
                 SampleResponse
                         .builder()
@@ -59,7 +78,7 @@ public class AuthController {
                         .data(new LoginResponse(
                                 token,
                                 customerDetailService.getFullname(),
-                                customerDetailService.getAuthorities(),
+                                roleEntity.getName(),
                                 customerDetailService.getUsername(),
                                 customerDetailService.getId(),
                                 customerDetailService.getPhone()
