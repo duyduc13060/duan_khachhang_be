@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -28,6 +30,11 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     List<UserEntity> searchUser(String username, String fullname);
 
     List<UserEntity> findByRoleId(Long roleId);
+
+    @Query(value = "select u.*,r.`name` as roleName \n" +
+            "from users u\n" +
+            "left join roles r on r.id = u.role_id " , nativeQuery = true)
+    List<Map<String, Objects>> listUserAndRole();
 
 
 

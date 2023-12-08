@@ -11,4 +11,6 @@ public interface MessageService {
     List<MessageDto> getListMessage();
 
     ServiceResult<ChatBoxResponse> saveMessage(ChatBoxRequest chatBoxRequest);
+
+    ServiceResult<ChatBoxResponse> saveMessageRestTemplate(ChatBoxRequest chatBoxRequest);
 }

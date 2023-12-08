@@ -136,4 +136,9 @@ public class RoleServiceImpl implements RoleService {
         return serviceResult;
     }
 
+    @Override
+    public List<RoleEntity> getListRole(){
+        return roleRepository.findAll();
+    }
+
 }

@@ -25,7 +25,7 @@ public class MessageEntity {
     @CreationTimestamp
     private LocalDateTime createTime;
 
-    @Column(name = "content_request")
+    @Column(name = "content_request", columnDefinition = "VARCHAR(500)")
     private String contentRequest;
 
     @Column(name = "content_reponse",  columnDefinition = "VARCHAR(500)")
@@ -36,5 +36,7 @@ public class MessageEntity {
     private String completionsId;
 
     private String roleChoices;
+
+    private String creator;
 
 }

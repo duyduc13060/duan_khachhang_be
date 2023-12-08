@@ -43,5 +43,9 @@ public class RoleController {
         return ResponseEntity.ok(this.roleService.delete(rolesDTO.getId()));
     }
 
+    @GetMapping("/role/list/get-all")
+    public ResponseEntity<?> getAll(){
+        return ResponseEntity.ok(roleService.getListRole());
+    }
 
 }

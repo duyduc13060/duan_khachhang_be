@@ -18,4 +18,5 @@ public class UserDto {
     private Long roleId;
     private Integer status;
     private String keySearch;
+    private String roleName;
 }

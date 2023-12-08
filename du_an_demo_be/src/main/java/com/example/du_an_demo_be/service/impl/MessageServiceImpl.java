@@ -9,12 +9,17 @@ import com.example.du_an_demo_be.payload.response.DefaultResponse;
 import com.example.du_an_demo_be.payload.response.ResultApiChatBox;
 import com.example.du_an_demo_be.payload.response.ServiceResult;
 import com.example.du_an_demo_be.repository.MessageRepository;
+import com.example.du_an_demo_be.security.CustomerDetailService;
 import com.example.du_an_demo_be.service.ChatBoxService;
 import com.example.du_an_demo_be.service.MessageService;
+import com.example.du_an_demo_be.until.CurrentUserUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -41,7 +46,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<MessageDto> getListMessage(){
-        List<MessageDto> messageDtoList = messageRepository.findAll()
+        CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
+
+        List<MessageDto> messageDtoList = messageRepository.getAllByCreator(customerDetailService.getUsername())
                 .stream()
                 .map(e -> modelMapper.map(e, MessageDto.class))
                 .collect(Collectors.toList());
@@ -55,6 +62,7 @@ public class MessageServiceImpl implements MessageService {
         ServiceResult serviceResult = new ServiceResult<>();
         DefaultResponse<ResultApiChatBox> response = chatBoxService.chatBox(chatBoxRequest, apiChatBox,tokenCompletions);
 
+        CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
@@ -76,6 +84,7 @@ public class MessageServiceImpl implements MessageService {
                         .model(chatBoxResponse.getModel())
                         .completionsId(chatBoxResponse.getId())
                         .roleChoices(message.getMessage().getRole())
+                        .creator(customerDetailService.getUsername())
                         .build();
                 this.messageRepository.save(messageEntity);
             }
@@ -87,6 +96,52 @@ public class MessageServiceImpl implements MessageService {
 
         return new ServiceResult<>( null ,HttpStatus.OK,"Thất bại");
     }
+
+
+    @Override
+    public ServiceResult<ChatBoxResponse> saveMessageRestTemplate(ChatBoxRequest chatBoxRequest){
+        ServiceResult serviceResult = new ServiceResult<>();
+        DefaultResponse<ResultApiChatBox> response = chatBoxService.chatBoxCallRestTemplate(chatBoxRequest, apiChatBox,tokenCompletions);
+
+        CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        if(response.getSuccess() != 200){
+            serviceResult.setStatus(HttpStatus.BAD_REQUEST);
+            serviceResult.setCode(Constants.CODE_FAIL);
+            serviceResult.setMessage("Call api chat bõ thất bại");
+            return serviceResult;
+        }
+
+        try {
+            JSONObject jsonContent1 = response.getData().getJsonObject();
+
+            Gson gson = new Gson();
+            ChatBoxResponse chatBoxResponse = gson.fromJson(jsonContent1.toString(), ChatBoxResponse.class);
+            for (ChatBoxResponse.Choices message : chatBoxResponse.getChoices()) {
+                MessageEntity messageEntity = MessageEntity.builder()
+                        .contentResponse(message.getMessage().getContent())
+                        .contentRequest(chatBoxRequest.getMessages().get(1).getContent())
+                        .model(chatBoxResponse.getModel())
+                        .completionsId(chatBoxResponse.getId())
+                        .roleChoices(message.getMessage().getRole())
+                        .creator(customerDetailService.getUsername())
+                        .build();
+                this.messageRepository.save(messageEntity);
+            }
+            return new ServiceResult<>( chatBoxResponse,HttpStatus.OK,"Thành công");
+
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return new ServiceResult<>( null ,HttpStatus.OK,"Thất bại");
+    }
+
 
 
 }

@@ -20,9 +20,15 @@ public class MessageController {
         return ResponseEntity.ok().body(messageService.getListMessage());
     }
 
+//    @PostMapping("/generate-message")
+//    public ResponseEntity<?> sendMessage(@RequestBody ChatBoxRequest chatBoxRequest){
+//       return   ResponseEntity.ok().body(messageService.saveMessage(chatBoxRequest));
+//    }
+
     @PostMapping("/generate-message")
     public ResponseEntity<?> sendMessage(@RequestBody ChatBoxRequest chatBoxRequest){
-       return   ResponseEntity.ok().body(messageService.saveMessage(chatBoxRequest));
+       return   ResponseEntity.ok().body(messageService.saveMessageRestTemplate(chatBoxRequest));
     }
+
 
 }

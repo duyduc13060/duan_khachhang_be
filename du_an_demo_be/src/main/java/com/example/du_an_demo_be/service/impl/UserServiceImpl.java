@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,13 +37,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public DefaultResponse<?> getListUser(){
         DefaultResponse<List<UserDto>> respose = new DefaultResponse<>();
-        List<UserEntity> userEntityList = userRepository.findAll();
 
-        List<UserDto> userDtoList = userEntityList.stream()
-                .map(e -> modelMapper.map(e,UserDto.class))
+        List<UserDto> list = userRepository.listUserAndRole()
+                .stream()
+                .map(item-> modelMapper.map(item,UserDto.class))
                 .collect(Collectors.toList());
 
-        respose.setData(userDtoList);
+        respose.setData(list);
         return respose;
     }
 

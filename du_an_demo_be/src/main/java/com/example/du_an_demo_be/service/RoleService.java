@@ -1,6 +1,7 @@
 package com.example.du_an_demo_be.service;
 
 import com.example.du_an_demo_be.model.dto.RolesDto;
+import com.example.du_an_demo_be.model.entity.RoleEntity;
 import com.example.du_an_demo_be.payload.response.DefaultResponse;
 import com.example.du_an_demo_be.payload.response.ServiceResult;
 import org.springframework.data.domain.Page;
@@ -13,4 +14,6 @@ public interface RoleService {
     ServiceResult delete(Long id);
 
     ServiceResult save(RolesDto rolesDTO);
+
+    List<RoleEntity> getListRole();
 }

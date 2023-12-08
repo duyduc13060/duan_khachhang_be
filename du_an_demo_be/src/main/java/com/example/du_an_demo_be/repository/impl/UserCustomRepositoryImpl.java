@@ -33,8 +33,10 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 "   u.role_id as roleId,\n" +
                 "   u.username,\n" +
                 "   u.status,\n" +
-                "   u.email\n" +
+                "   u.email,\n" +
+                "   r.name as roleName\n" +
                 "FROM users u\n" +
+                "left join roles r on r.id = u.role_id\n" +
                 "where (\t(1 = 1  \n" +
                 "\t\tAND ( :status is null or u.status = :status)\n" +
                 "\t\tAND ( :keySearch is null or u.username like CONCAT('%', :keySearch, '%') OR u.fullname like CONCAT('%', :keySearch, '%'))\t\t\n" +
@@ -59,6 +61,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 userDto1.setUsername(DataUtil.safeToString(obj[6]));
                 userDto1.setStatus(DataUtil.safeToInt(obj[7]));
                 userDto1.setEmail(DataUtil.safeToString(obj[8]));
+                userDto1.setRoleName(DataUtil.safeToString(obj[9]));
                 userDtoList.add(userDto1);
             }
         }
