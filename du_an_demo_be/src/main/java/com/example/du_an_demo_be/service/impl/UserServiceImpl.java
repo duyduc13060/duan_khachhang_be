@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
         Optional<UserEntity> fUserEntity = userRepository.findByUsername(customerDetailService.getUsername());
 
         if(fUserEntity.get().getUsername().equals(findById.getUsername())){
-            response.setMessage("Không được xóa chính mình");
+            response.setMessage("Bạn không được xóa chính mình");
             response.setSuccess(HttpStatus.BAD_REQUEST.value());
             return response;
         }

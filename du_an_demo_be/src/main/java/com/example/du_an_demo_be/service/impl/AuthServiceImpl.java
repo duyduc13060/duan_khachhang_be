@@ -21,10 +21,10 @@ import java.util.Optional;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
-
     private final ModelMapper modelMapper;
-
     private final PasswordEncoder passwordEncoder;
+
+
 
 
     // todo: hàm này dùng để đăng ký tài khoản
@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
 
         UserEntity userEntity = modelMapper.map(userRegister, UserEntity.class);
         userEntity.setPassword(passwordEncoder.encode(userRegister.getPassword()));
-        userEntity.setStatus(1);
+        userEntity.setStatus(0);
 
         userRegister = modelMapper.map(userRepository.save(userEntity),UserRegister.class);
 

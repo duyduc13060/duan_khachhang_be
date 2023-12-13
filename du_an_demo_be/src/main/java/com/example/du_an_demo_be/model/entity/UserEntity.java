@@ -39,7 +39,7 @@ public class UserEntity {
     @Column(name = "address")
     private String address;
 
-    private Integer status;
+    private Integer status; // 1:Active ; 0:In-Active
 
     private Long roleId;
 

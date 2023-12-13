@@ -25,10 +25,10 @@ public class MessageEntity {
     @CreationTimestamp
     private LocalDateTime createTime;
 
-    @Column(name = "content_request", columnDefinition = "VARCHAR(500)")
+    @Column(name = "content_request", columnDefinition = "LONGTEXT")
     private String contentRequest;
 
-    @Column(name = "content_reponse",  columnDefinition = "VARCHAR(500)")
+    @Column(name = "content_reponse",  columnDefinition = "LONGTEXT")
     private String contentResponse;
 
     private String model;
