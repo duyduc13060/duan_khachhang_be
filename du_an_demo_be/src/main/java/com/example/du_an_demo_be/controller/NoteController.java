@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/note")
+@RequestMapping("/api/QLNOTE/note")
 @RequiredArgsConstructor
 public class NoteController {
 

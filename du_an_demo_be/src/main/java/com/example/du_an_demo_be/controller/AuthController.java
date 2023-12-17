@@ -2,6 +2,7 @@ package com.example.du_an_demo_be.controller;
 
 import com.example.du_an_demo_be.exception.BadRequestException;
 import com.example.du_an_demo_be.exception.NotFoundException;
+import com.example.du_an_demo_be.model.dto.RolesDto;
 import com.example.du_an_demo_be.model.entity.RoleEntity;
 import com.example.du_an_demo_be.model.entity.UserEntity;
 import com.example.du_an_demo_be.payload.request.LoginRequest;
@@ -14,6 +15,8 @@ import com.example.du_an_demo_be.repository.UserRepository;
 import com.example.du_an_demo_be.security.CustomerDetailService;
 import com.example.du_an_demo_be.security.jwt.JwtProvider;
 import com.example.du_an_demo_be.service.AuthService;
+import com.example.du_an_demo_be.service.RoleService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,6 +44,7 @@ public class AuthController {
     private final JwtProvider jwtProvider;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final RoleService roleService;
 
     @Autowired
     public AuthController(
@@ -48,13 +52,15 @@ public class AuthController {
             AuthService authService,
             JwtProvider jwtProvider,
             RoleRepository roleRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            RoleService roleService
     ){
         this.authenticationManager = authenticationManager;
         this.authService = authService;
         this.jwtProvider = jwtProvider;
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
+        this.roleService = roleService;
     }
 
 
@@ -92,6 +98,8 @@ public class AuthController {
             RoleEntity roleEntity = roleRepository.findById(userEntity.getRoleId())
                     .orElseThrow(() -> new UsernameNotFoundException("Role name not found"));
 
+            RolesDto rolesDto = this.roleService.getByEmployeeId(userEntity.getId());
+
 
             return ResponseEntity.ok(
                     SampleResponse
@@ -104,11 +112,14 @@ public class AuthController {
                                 roleEntity.getName(),
                                 customerDetailService.getUsername(),
                                 customerDetailService.getId(),
-                                customerDetailService.getPhone()
+                                customerDetailService.getPhone(),
+                                rolesDto
                         ))
                         .build());
         } catch (AuthenticationException e) {
             throw e;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 

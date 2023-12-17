@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/task")
+@RequestMapping("/api/QLTASK/task")
 @RequiredArgsConstructor
 public class TaskController {
 

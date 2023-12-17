@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/chat-box")
+@RequestMapping("/api/QLCHAT/chat-box")
 @RequiredArgsConstructor
 public class MessageController {
 

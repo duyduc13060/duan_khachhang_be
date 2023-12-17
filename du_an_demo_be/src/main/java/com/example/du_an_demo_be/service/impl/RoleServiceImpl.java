@@ -11,6 +11,7 @@ import com.example.du_an_demo_be.repository.RoleDetailRepository;
 import com.example.du_an_demo_be.repository.RoleRepository;
 import com.example.du_an_demo_be.repository.UserRepository;
 import com.example.du_an_demo_be.service.RoleService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
@@ -140,5 +141,12 @@ public class RoleServiceImpl implements RoleService {
     public List<RoleEntity> getListRole(){
         return roleRepository.findAll();
     }
+
+
+    @Override
+    public RolesDto getByEmployeeId(Long id) throws JsonProcessingException {
+        return this.roleCustomRepository.getByEmployeeId(id);
+    }
+
 
 }

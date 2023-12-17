@@ -26,32 +26,35 @@ public class FunctionServiceImpl implements FunctionService {
 
     @Override
     public void create(){
-
-        List<ActionEntity> entityList = new ArrayList<>();
-        entityList.add(new ActionEntity(1L,"create", "Thêm mới"));
-        entityList.add(new ActionEntity(2L,"update", "Chỉnh sửa"));
-        entityList.add(new ActionEntity(3L,"delete", "Xóa"));
-        entityList.add(new ActionEntity(4L,"search", "Tìm kiếm"));
-        entityList.add(new ActionEntity(5L,"detail", "Chi tiết"));
-        this.actionRepository.saveAll(entityList);
+//
+//        List<ActionEntity> entityList = new ArrayList<>();
+//        entityList.add(new ActionEntity(1L,"create", "Thêm mới"));
+//        entityList.add(new ActionEntity(2L,"update", "Chỉnh sửa"));
+//        entityList.add(new ActionEntity(3L,"delete", "Xóa"));
+//        entityList.add(new ActionEntity(4L,"search", "Tìm kiếm"));
+//        entityList.add(new ActionEntity(5L,"detail", "Chi tiết"));
+//        this.actionRepository.saveAll(entityList);
 
         List<FuntionEntity> funtionEntities = new ArrayList<>();
         funtionEntities.add(new FuntionEntity(1L,"QLU","Quản lý user"));
         funtionEntities.add(new FuntionEntity(2L,"QLN","Quản lý note"));
         funtionEntities.add(new FuntionEntity(3L,"QLTASK","Quản lý task"));
+        funtionEntities.add(new FuntionEntity(4L,"QLR","Quản lý role"));
+        funtionEntities.add(new FuntionEntity(5L,"QLNOTE","Quản lý note"));
+        funtionEntities.add(new FuntionEntity(6L,"QLCHAT","Quản lý chat-box"));
         this.funtionRepository.saveAll(funtionEntities);
 
-        List<RoleEntity> roleEntityList = new ArrayList<>();
-        roleEntityList.add(new RoleEntity(1L,"ADM","ADMIN",1,"Quản lý tất cả"));
-        roleEntityList.add(new RoleEntity(2L,"USR","USER",1,"Giới hạn quyền truy cập"));
-        roleEntityList.add(new RoleEntity(3L,"CTM","CUSTOMER",1,"Giới hạn quyền truy cập"));
-        this.roleRepository.saveAll(roleEntityList);
-
-        List<RoleDetailEntity> roleDetailEntities = new ArrayList<>();
-        roleDetailEntities.add(new RoleDetailEntity(1L,1L,1L,"1,2,3"));
-        roleDetailEntities.add(new RoleDetailEntity(2L,2L,2L,"1,2"));
-        roleDetailEntities.add(new RoleDetailEntity(3L,3L,3L,"1"));
-        this.roleRepository.saveAll(roleEntityList);
+//        List<RoleEntity> roleEntityList = new ArrayList<>();
+//        roleEntityList.add(new RoleEntity(1L,"ADM","ADMIN",1,"Quản lý tất cả"));
+//        roleEntityList.add(new RoleEntity(2L,"USR","USER",1,"Giới hạn quyền truy cập"));
+//        roleEntityList.add(new RoleEntity(3L,"CTM","CUSTOMER",1,"Giới hạn quyền truy cập"));
+//        this.roleRepository.saveAll(roleEntityList);
+//
+//        List<RoleDetailEntity> roleDetailEntities = new ArrayList<>();
+//        roleDetailEntities.add(new RoleDetailEntity(1L,1L,1L,"1,2,3"));
+//        roleDetailEntities.add(new RoleDetailEntity(2L,2L,2L,"1,2"));
+//        roleDetailEntities.add(new RoleDetailEntity(3L,3L,3L,"1"));
+//        this.roleRepository.saveAll(roleEntityList);
 
 
     }

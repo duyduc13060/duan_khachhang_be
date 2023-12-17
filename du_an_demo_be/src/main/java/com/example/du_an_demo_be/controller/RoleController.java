@@ -14,31 +14,31 @@ import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/QLR")
 @RequiredArgsConstructor
 public class RoleController {
 
     private final RoleService roleService;
     private final FunctionService functionService;
 
-    @PostMapping("/role/search/roles/search")
+    @PostMapping("/search/role/search/roles/search")
     public Page<RolesDto> search(@RequestBody RolesDto rolesDTO,
                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                  @RequestParam(value = "size", defaultValue = "10") int size){
         return this.roleService.search(rolesDTO,page,size);
     }
 
-    @PostMapping("/role/create/roles")
+    @PostMapping("/create/role/create/roles")
     public ResponseEntity<?> createRoles(@RequestBody RolesDto rolesDTO) throws URISyntaxException {
         return ResponseEntity.ok(this.roleService.save(rolesDTO));
     }
 
-    @PostMapping("/role/update/roles")
+    @PostMapping("/update/role/update/roles")
     public ResponseEntity<?> updateRoles(@RequestBody RolesDto rolesDTO) throws URISyntaxException {
         return ResponseEntity.ok(this.roleService.save(rolesDTO));
     }
 
-    @PostMapping("/role/delete/roles")
+    @PostMapping("/delete/role/delete/roles")
     public ResponseEntity<?> deleteRoles(@RequestBody RolesDto rolesDTO) {
         return ResponseEntity.ok(this.roleService.delete(rolesDTO.getId()));
     }
