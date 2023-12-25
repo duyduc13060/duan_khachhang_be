@@ -2,6 +2,7 @@ package com.example.du_an_demo_be.controller.feign;
 
 
 import com.example.du_an_demo_be.payload.request.ChatBoxRequest;
+import com.example.du_an_demo_be.payload.request.amazon.ChatBoxAmazonRequest;
 import com.example.du_an_demo_be.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,14 @@ public class MessageController {
     public ResponseEntity<?> sendMessage(@RequestBody ChatBoxRequest chatBoxRequest){
        return   ResponseEntity.ok().body(messageService.saveMessageRestTemplate(chatBoxRequest));
     }
+
+
+    //Todo:
+    @PostMapping("/generate-message-amazon")
+    public ResponseEntity<?> sendMessage(@RequestBody ChatBoxAmazonRequest chatBoxRequest){
+        return   ResponseEntity.ok().body(messageService.saveMessageChatBoxAmazon(chatBoxRequest));
+    }
+
 
 
 }

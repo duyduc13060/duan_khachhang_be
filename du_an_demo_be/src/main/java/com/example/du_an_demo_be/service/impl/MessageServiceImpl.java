@@ -4,10 +4,12 @@ import com.example.du_an_demo_be.config.Constants;
 import com.example.du_an_demo_be.model.dto.MessageDto;
 import com.example.du_an_demo_be.model.entity.MessageEntity;
 import com.example.du_an_demo_be.payload.request.ChatBoxRequest;
+import com.example.du_an_demo_be.payload.request.amazon.ChatBoxAmazonRequest;
 import com.example.du_an_demo_be.payload.response.ChatBoxResponse;
 import com.example.du_an_demo_be.payload.response.DefaultResponse;
 import com.example.du_an_demo_be.payload.response.ResultApiChatBox;
 import com.example.du_an_demo_be.payload.response.ServiceResult;
+import com.example.du_an_demo_be.payload.response.amazon.ChatBoxAmazonResponse;
 import com.example.du_an_demo_be.repository.MessageRepository;
 import com.example.du_an_demo_be.security.CustomerDetailService;
 import com.example.du_an_demo_be.service.ChatBoxService;
@@ -41,6 +43,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Value("https://api.perplexity.ai/chat/completions")
     public String apiChatBox;
+
+    @Value("https://oqt1iem2ub.execute-api.us-east-1.amazonaws.com/Product/bedrock")
+    public String apiChatBoxAmazon;
 
 
 
@@ -127,6 +132,7 @@ public class MessageServiceImpl implements MessageService {
                         .completionsId(chatBoxResponse.getId())
                         .roleChoices(message.getMessage().getRole())
                         .creator(customerDetailService.getUsername())
+                        .type(0)
                         .build();
                 this.messageRepository.save(messageEntity);
             }
@@ -139,6 +145,50 @@ public class MessageServiceImpl implements MessageService {
         }
 
 
+        return new ServiceResult<>( null ,HttpStatus.OK,"Thất bại");
+    }
+
+    @Override
+    public ServiceResult<ChatBoxAmazonResponse> saveMessageChatBoxAmazon(ChatBoxAmazonRequest chatBoxRequest){
+        ServiceResult serviceResult = new ServiceResult<>();
+//        DefaultResponse<ResultApiChatBox> response = chatBoxService.chatBoxAmazon(chatBoxRequest, apiChatBoxAmazon);
+        DefaultResponse<ResultApiChatBox> response = chatBoxService.chatBoxTest(chatBoxRequest, apiChatBoxAmazon);
+
+        CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        if(response.getSuccess() != 200){
+            serviceResult.setStatus(HttpStatus.BAD_REQUEST);
+            serviceResult.setCode(Constants.CODE_FAIL);
+            serviceResult.setMessage("Call api chat box thất bại");
+            return serviceResult;
+        }
+
+        try {
+
+            JSONObject jsonContent1 = response.getData().getJsonObject();
+
+            JSONObject jsonBody = jsonContent1.getJSONObject("body");
+
+            Gson gson = new Gson();
+            ChatBoxAmazonResponse chatBoxResponse = gson.fromJson(jsonBody.toString(), ChatBoxAmazonResponse.class);
+
+            MessageEntity messageEntity = MessageEntity.builder()
+                    .contentResponse(chatBoxResponse.getCompletion())
+                    .contentRequest(chatBoxRequest.getPrompt())
+                    .model(chatBoxRequest.getKey())
+                    .creator(customerDetailService.getUsername())
+                    .type(1)
+                    .build();
+            this.messageRepository.save(messageEntity);
+
+            return new ServiceResult<>( chatBoxResponse,HttpStatus.OK,"Thành công");
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return new ServiceResult<>( null ,HttpStatus.OK,"Thất bại");
     }
 
