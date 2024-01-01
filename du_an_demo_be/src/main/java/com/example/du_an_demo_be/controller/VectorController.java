@@ -31,29 +31,29 @@ public class VectorController {
 
     private final VectorService vectorService;
 
-    @PostMapping("/search")
-    public List<VectorEntity> search(@RequestBody String query) {
-        List<VectorEntity> results = vectorService.processSearch(query);
-        return results;
-    }
-
-    @PostMapping("/search-new")
-    public List<String> searchNew(@RequestBody String query) {
-        List<String> results = vectorService.querySimilarVectors(query);
-        return results;
-    }
-
-
-    @PostMapping("/save-vectors")
-    public void saveVectors(@RequestBody List<String> docs) {
-        vectorService.processAndSaveVectors(docs);
-    }
-
-
-    @PostMapping("/save-vectors-new")
-    public void saveVectors(@RequestBody String docs) {
-        vectorService.processAndSaveVectorsNew(docs);
-    }
+//    @PostMapping("/search")
+//    public List<VectorEntity> search(@RequestBody String query) {
+//        List<VectorEntity> results = vectorService.processSearch(query);
+//        return results;
+//    }
+//
+//    @PostMapping("/search-new")
+//    public List<String> searchNew(@RequestBody String query) {
+//        List<String> results = vectorService.querySimilarVectors(query);
+//        return results;
+//    }
+//
+//
+//    @PostMapping("/save-vectors")
+//    public void saveVectors(@RequestBody List<String> docs) {
+//        vectorService.processAndSaveVectors(docs);
+//    }
+//
+//
+//    @PostMapping("/save-vectors-new")
+//    public void saveVectors(@RequestBody String docs) {
+//        vectorService.processAndSaveVectorsNew(docs);
+//    }
 
 
 
