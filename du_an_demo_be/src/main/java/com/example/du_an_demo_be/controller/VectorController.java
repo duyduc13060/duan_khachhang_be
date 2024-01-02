@@ -1,35 +1,27 @@
 package com.example.du_an_demo_be.controller;
 
 
-import com.example.du_an_demo_be.model.entity.VectorEntity;
+import com.example.du_an_demo_be.model.dto.ElasticSearchDto;
 import com.example.du_an_demo_be.service.VectorService;
+import com.example.du_an_demo_be.service.elasticsearch.VectorSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.InputStream;
-import java.util.List;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.sax.BodyContentHandler;
-
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/vector")
+@RequestMapping("/api/QLQS")
 @RequiredArgsConstructor
 public class VectorController {
 
     private final VectorService vectorService;
+    private final VectorSearchService vectorSearchService;
 
 //    @PostMapping("/search")
 //    public List<VectorEntity> search(@RequestBody String query) {
@@ -85,14 +77,23 @@ public class VectorController {
 //        }
 //    }
 
-    @PostMapping("/files/upload")
-    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
+    @PostMapping("/import/upload")
+    public ResponseEntity<String> handleFileUpload(
+            @RequestParam("file") MultipartFile file
+    ) {
         try {
             return ResponseEntity.ok().body(this.vectorService.uploadFile(file));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Lỗi khi xử lý file");
         }
+    }
+
+    @PostMapping("/search/vector")
+    public ResponseEntity<?> fetchSuggestions(
+            @RequestBody ElasticSearchDto elasticSearchDto
+            ){
+        return ResponseEntity.ok().body(this.vectorSearchService.processSearch(elasticSearchDto.getDocument()));
     }
 
 }

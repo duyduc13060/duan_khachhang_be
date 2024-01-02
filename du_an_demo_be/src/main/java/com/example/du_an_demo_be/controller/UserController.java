@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/QLU/user")
+@RequestMapping("/api/QLU")
 @RequiredArgsConstructor
 public class UserController {
 

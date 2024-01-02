@@ -4,11 +4,18 @@ import com.example.du_an_demo_be.model.entity.VectorEntity;
 import com.example.du_an_demo_be.repository.elasticsearch.ElasticsearchVectorRepository;
 import com.example.du_an_demo_be.service.elasticsearch.VectorSearchService;
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.common.unit.Fuzziness;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.IndexedObjectInformation;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -59,6 +66,58 @@ public class VectorSearchServiceImpl implements VectorSearchService {
             trunks.add(doc.substring(i, end));
         }
         return trunks;
+    }
+
+
+    @Override
+    public List<String> fetchSuggestions(String query) {
+        QueryBuilder queryBuilder = QueryBuilders
+                .wildcardQuery("document", query + "*");
+
+        Query searchQuery = new NativeSearchQueryBuilder()
+                .withFilter(queryBuilder)
+                .withPageable(PageRequest.of(0, 5))
+                .build();
+
+        SearchHits<VectorEntity> searchSuggestions =
+                elasticsearchOperations.search(searchQuery,
+                        VectorEntity.class,
+                        IndexCoordinates.of(MESSAGE_INDEX));
+
+        List<String> suggestions = new ArrayList<String>();
+
+        searchSuggestions.getSearchHits().forEach(searchHit->{
+            suggestions.add(searchHit.getContent().getDocument());
+        });
+        return suggestions;
+    }
+
+
+    @Override
+    public List<VectorEntity> processSearch(final String query) {
+
+        // 1. Create query on multiple fields enabling fuzzy search
+        QueryBuilder queryBuilder =
+                QueryBuilders
+                        .multiMatchQuery(query, "document", "description")
+                        .fuzziness(Fuzziness.AUTO);
+
+        Query searchQuery = new NativeSearchQueryBuilder()
+                .withFilter(queryBuilder)
+                .build();
+
+        // 2. Execute search
+        SearchHits<VectorEntity> productHits =
+                elasticsearchOperations
+                        .search(searchQuery, VectorEntity.class,
+                                IndexCoordinates.of(MESSAGE_INDEX));
+
+        // 3. Map searchHits to product list
+        List<VectorEntity> productMatches = new ArrayList<VectorEntity>();
+        productHits.forEach(searchHit->{
+            productMatches.add(searchHit.getContent());
+        });
+        return productMatches;
     }
 
 

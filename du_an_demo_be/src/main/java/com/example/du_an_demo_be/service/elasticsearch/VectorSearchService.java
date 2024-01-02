@@ -10,4 +10,8 @@ public interface VectorSearchService {
             (List<VectorEntity> vectorEntities);
 
     String createProductIndex(VectorEntity vectorEntities);
+
+    List<String> fetchSuggestions(String query);
+
+    List<VectorEntity> processSearch(String query);
 }
