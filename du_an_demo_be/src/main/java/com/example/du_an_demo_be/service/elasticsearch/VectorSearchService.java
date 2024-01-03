@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface VectorSearchService {
     List<IndexedObjectInformation> createProductIndexBulk
-            (List<VectorEntity> vectorEntities);
+            (String content);
 
-    String createProductIndex(VectorEntity vectorEntities);
+    List<String> createProductIndex(String content);
 
     List<String> fetchSuggestions(String query);
 

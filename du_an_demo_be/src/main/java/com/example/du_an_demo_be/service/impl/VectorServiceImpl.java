@@ -148,18 +148,19 @@ public class VectorServiceImpl implements VectorService {
 
             if(!content.isEmpty() || content != null){
                 //todo: lưu data trong file vào vector
-                VectorEntity vector = new VectorEntity();
-                vector.setId("vector_" +
-                        Calendar.getInstance().get(Calendar.YEAR) +
-                        (Calendar.getInstance().get(Calendar.MONTH) + 1) +
-                        Calendar.getInstance().get(Calendar.DATE) +
-                        "_" +
-                        Calendar.getInstance().get(Calendar.HOUR) +
-                        Calendar.getInstance().get(Calendar.MINUTE) +
-                        Calendar.getInstance().get(Calendar.MILLISECOND));
-                vector.setDocument(content);
-                this.vectorSearchService.createProductIndex(vector);
-//                this.processAndSaveVectorsNew(content);
+//                VectorEntity vector = new VectorEntity();
+//                vector.setId("vector_" +
+//                        Calendar.getInstance().get(Calendar.YEAR) +
+//                        (Calendar.getInstance().get(Calendar.MONTH) + 1) +
+//                        Calendar.getInstance().get(Calendar.DATE) +
+//                        "_" +
+//                        Calendar.getInstance().get(Calendar.HOUR) +
+//                        Calendar.getInstance().get(Calendar.MINUTE) +
+//                        Calendar.getInstance().get(Calendar.MILLISECOND));
+//                vector.setDocument(content);
+
+                this.vectorSearchService.createProductIndex(content);
+//                this.vectorSearchService.createProductIndexBulk(content);
             }else{
                 throw new BadRequestException("Content is null");
             }

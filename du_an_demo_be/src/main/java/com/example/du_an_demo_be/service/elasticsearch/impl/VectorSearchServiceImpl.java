@@ -19,6 +19,7 @@ import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,12 +33,30 @@ public class VectorSearchServiceImpl implements VectorSearchService {
 
     @Override
     public List<IndexedObjectInformation> createProductIndexBulk
-            (final List<VectorEntity> vectorEntities) {
+            (final String content) {
+
+        List<String> trunks = this.splitIntoTrunks1(content, 1000);
+        List<VectorEntity> vectorEntities = new ArrayList<>();
+
+        trunks.forEach(item ->{
+            VectorEntity vector = new VectorEntity();
+            vector.setId("vector_" +
+                    Calendar.getInstance().get(Calendar.YEAR) +
+                    (Calendar.getInstance().get(Calendar.MONTH) + 1) +
+                    Calendar.getInstance().get(Calendar.DATE) +
+                    "_" +
+                    Calendar.getInstance().get(Calendar.HOUR) +
+                    Calendar.getInstance().get(Calendar.MINUTE) +
+                    Calendar.getInstance().get(Calendar.MILLISECOND));
+            vector.setDocument(content);
+
+            vectorEntities.add(vector);
+        });
 
         List<IndexQuery> queries = vectorEntities.stream()
                 .map(product->
                         new IndexQueryBuilder()
-                                .withId(product.getId().toString())
+                                .withId(product.getId())
                                 .withObject(product).build())
                 .collect(Collectors.toList());;
 
@@ -45,16 +64,33 @@ public class VectorSearchServiceImpl implements VectorSearchService {
     }
 
     @Override
-    public String createProductIndex(VectorEntity vectorEntities) {
+    public List<String> createProductIndex(String content) {
+        List<String> trunks = this.splitIntoTrunks1(content, 1000);
+        List<String> documentIds = new ArrayList<>();
 
-        IndexQuery indexQuery = new IndexQueryBuilder()
-                .withId(vectorEntities.getId())
-                .withObject(vectorEntities).build();
+        trunks.forEach(item ->{
+            VectorEntity vectorEntities = new VectorEntity();
+            vectorEntities.setId("vector_" +
+                    Calendar.getInstance().get(Calendar.YEAR) +
+                    (Calendar.getInstance().get(Calendar.MONTH) + 1) +
+                    Calendar.getInstance().get(Calendar.DATE) +
+                    "_" +
+                    Calendar.getInstance().get(Calendar.HOUR) +
+                    Calendar.getInstance().get(Calendar.MINUTE) +
+                    Calendar.getInstance().get(Calendar.MILLISECOND));
+            vectorEntities.setDocument(item);
 
-        String documentId = elasticsearchOperations
-                .index(indexQuery, IndexCoordinates.of(MESSAGE_INDEX));
+            IndexQuery indexQuery = new IndexQueryBuilder()
+                    .withId(vectorEntities.getId())
+                    .withObject(vectorEntities).build();
 
-        return documentId;
+            String documentId = elasticsearchOperations
+                    .index(indexQuery, IndexCoordinates.of(MESSAGE_INDEX));
+
+            documentIds.add(documentId);
+
+        });
+        return documentIds;
     }
 
 
