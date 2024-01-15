@@ -2,6 +2,7 @@ package com.example.du_an_demo_be.repository.impl;
 
 import com.example.du_an_demo_be.common.DataUtil;
 import com.example.du_an_demo_be.model.dto.UserDto;
+import com.example.du_an_demo_be.payload.request.SearchDTO;
 import com.example.du_an_demo_be.repository.UserCustomRepository;
 import com.example.du_an_demo_be.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,9 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
     private final EntityManager entityManager;
 
     @Override
-    public List<UserDto> searchUser(UserDto userDto){
+    public List<UserDto> searchUser(SearchDTO<UserDto> searchDTO){
+
+        UserDto userDto = searchDTO.getData();
 
         StringBuilder sql = new StringBuilder("SELECT \n" +
                 "   u.id,\n" +
@@ -34,13 +37,25 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 "   u.username,\n" +
                 "   u.status,\n" +
                 "   u.email,\n" +
-                "   r.name as roleName\n" +
+                "   r.name as roleName,\n" +
+                "   COUNT(*) OVER() \"total\" \n" +
                 "FROM users u\n" +
                 "left join roles r on r.id = u.role_id\n" +
                 "where (\t(1 = 1  \n" +
                 "\t\tAND ( :status is null or u.status = :status)\n" +
                 "\t\tAND ( :keySearch is null or u.username like CONCAT('%', :keySearch, '%') OR u.fullname like CONCAT('%', :keySearch, '%'))\t\t\n" +
-                "))");
+                ")) \n");
+
+
+        if (searchDTO.getPage() != null && searchDTO.getPageSize() != null) {
+            Integer offset;
+            if (searchDTO.getPage() <= 1) {
+                offset = 0;
+            } else {
+                offset = (searchDTO.getPage() - 1) * searchDTO.getPageSize();
+            }
+            sql.append("\t\t LIMIT " + offset + " , " + searchDTO.getPageSize() + " ");
+        }
 
         Query query = entityManager.createNativeQuery(sql.toString());
         query.setParameter("status", userDto.getStatus());
@@ -51,7 +66,6 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
         if (ObjectUtils.isNotEmpty(objects)) {
             for (Object[] obj : objects) {
                 UserDto userDto1 = new UserDto();
-
                 userDto1.setId(DataUtil.safeToLong(obj[0]));
                 userDto1.setAddress(DataUtil.safeToString(obj[1]));
                 userDto1.setCreateDate(DataUtil.safeToLocalDateTime(obj[2]));
@@ -62,6 +76,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 userDto1.setStatus(DataUtil.safeToInt(obj[7]));
                 userDto1.setEmail(DataUtil.safeToString(obj[8]));
                 userDto1.setRoleName(DataUtil.safeToString(obj[9]));
+                userDto1.setTotal(DataUtil.safeToLong(obj[10]));
                 userDtoList.add(userDto1);
             }
         }

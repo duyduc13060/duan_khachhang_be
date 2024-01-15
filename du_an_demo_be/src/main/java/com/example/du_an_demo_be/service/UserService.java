@@ -1,7 +1,10 @@
 package com.example.du_an_demo_be.service;
 
 import com.example.du_an_demo_be.model.dto.UserDto;
+import com.example.du_an_demo_be.payload.request.SearchDTO;
 import com.example.du_an_demo_be.payload.response.DefaultResponse;
+import com.example.du_an_demo_be.payload.response.SearchResponseDTO;
+import com.example.du_an_demo_be.payload.response.ServiceResult;
 
 import java.util.List;
 
@@ -9,7 +12,7 @@ public interface UserService {
     //todo: Lấy ra danh sách user
     DefaultResponse<?> getListUser();
 
-    DefaultResponse<List<UserDto>> search(UserDto userDto);
+    ServiceResult<SearchResponseDTO> search(SearchDTO<UserDto> searchDTO);
 
     DefaultResponse<?> createUser(UserDto userDto);
 

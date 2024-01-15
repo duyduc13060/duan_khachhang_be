@@ -3,7 +3,10 @@ package com.example.du_an_demo_be.service.impl;
 import com.example.du_an_demo_be.exception.BadRequestException;
 import com.example.du_an_demo_be.model.dto.UserDto;
 import com.example.du_an_demo_be.model.entity.UserEntity;
+import com.example.du_an_demo_be.payload.request.SearchDTO;
 import com.example.du_an_demo_be.payload.response.DefaultResponse;
+import com.example.du_an_demo_be.payload.response.SearchResponseDTO;
+import com.example.du_an_demo_be.payload.response.ServiceResult;
 import com.example.du_an_demo_be.repository.UserCustomRepository;
 import com.example.du_an_demo_be.repository.UserRepository;
 import com.example.du_an_demo_be.security.CustomerDetailService;
@@ -49,11 +52,25 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public DefaultResponse<List<UserDto>> search(UserDto userDto){
+    public ServiceResult<SearchResponseDTO> search(SearchDTO<UserDto> searchDTO){
+        ServiceResult<SearchResponseDTO> dataResult = new ServiceResult<>();
 
-        List<UserDto> listUserDto = userCustomRepository.searchUser(userDto);
+        List<UserDto> listUserDto = userCustomRepository.searchUser(searchDTO);
 
-        return DefaultResponse.success(listUserDto);
+        dataResult.setMessage("thành công");
+        dataResult.setStatus(HttpStatus.OK);
+
+        SearchResponseDTO searchResponseDTO = new SearchResponseDTO(0L, listUserDto, 0, searchDTO.getPage(), searchDTO.getPageSize());
+        if(listUserDto.size() > 0){
+            searchResponseDTO.setTotal(listUserDto.get(0).getTotal());
+        }
+
+        if(searchResponseDTO.getPageSize() != null && searchResponseDTO.getPageSize() > 0){
+            searchResponseDTO.setTotalPage((int) Math.ceil(searchResponseDTO.getTotal() / searchResponseDTO.getPageSize().doubleValue()));
+        }
+
+        dataResult.setData(searchResponseDTO);
+        return dataResult;
     }
 
     @Override

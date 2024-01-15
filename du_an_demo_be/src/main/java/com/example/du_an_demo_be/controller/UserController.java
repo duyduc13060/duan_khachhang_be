@@ -1,6 +1,7 @@
 package com.example.du_an_demo_be.controller;
 
 import com.example.du_an_demo_be.model.dto.UserDto;
+import com.example.du_an_demo_be.payload.request.SearchDTO;
 import com.example.du_an_demo_be.payload.response.DefaultResponse;
 import com.example.du_an_demo_be.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +22,10 @@ public class UserController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<DefaultResponse<?>> search(
-            @RequestBody UserDto userDto
+    public ResponseEntity<?> search(
+            @RequestBody SearchDTO<UserDto> searchDTO
             ){
-        return ResponseEntity.ok().body(userService.search(userDto));
+        return ResponseEntity.ok().body(userService.search(searchDTO));
     }
 
     @PostMapping("/create/user")

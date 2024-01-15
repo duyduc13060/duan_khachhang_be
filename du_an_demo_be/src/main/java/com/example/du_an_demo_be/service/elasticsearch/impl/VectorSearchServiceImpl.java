@@ -7,9 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.IndexedObjectInformation;
+import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
@@ -132,6 +135,28 @@ public class VectorSearchServiceImpl implements VectorSearchService {
     @Override
     public List<VectorEntity> processSearch(final String query) {
 
+//        // 1. Create query on multiple fields enabling fuzzy search
+//        QueryBuilder queryBuilder =
+//                QueryBuilders
+//                        .multiMatchQuery(query, "document", "description")
+//                        .fuzziness(Fuzziness.AUTO);
+//
+//        Query searchQuery = new NativeSearchQueryBuilder()
+//                .withFilter(queryBuilder)
+//                .build();
+//
+//        // 2. Execute search
+//        SearchHits<VectorEntity> productHits =
+//                elasticsearchOperations
+//                        .search(searchQuery, VectorEntity.class,
+//                                IndexCoordinates.of(MESSAGE_INDEX));
+//
+//        // 3. Map searchHits to product list
+//        List<VectorEntity> productMatches = new ArrayList<VectorEntity>();
+//        productHits.forEach(searchHit->{
+//            productMatches.add(searchHit.getContent());
+//        });
+//        return productMatches;
         // 1. Create query on multiple fields enabling fuzzy search
         QueryBuilder queryBuilder =
                 QueryBuilders
@@ -139,7 +164,8 @@ public class VectorSearchServiceImpl implements VectorSearchService {
                         .fuzziness(Fuzziness.AUTO);
 
         Query searchQuery = new NativeSearchQueryBuilder()
-                .withFilter(queryBuilder)
+                .withQuery(queryBuilder)
+                .withSort(SortBuilders.scoreSort().order(SortOrder.DESC))
                 .build();
 
         // 2. Execute search
@@ -149,10 +175,20 @@ public class VectorSearchServiceImpl implements VectorSearchService {
                                 IndexCoordinates.of(MESSAGE_INDEX));
 
         // 3. Map searchHits to product list
+//        List<VectorEntity> productMatches = new ArrayList<VectorEntity>();
+//        int i = 0;
+//        productHits.forEach(searchHit->{
+//            productMatches.add(searchHit.getContent());
+//        });
+        // 3. Map searchHits to product list
         List<VectorEntity> productMatches = new ArrayList<VectorEntity>();
-        productHits.forEach(searchHit->{
+        int i = 0;
+        for (SearchHit<VectorEntity> searchHit : productHits) {
             productMatches.add(searchHit.getContent());
-        });
+            if (productMatches.size() > 4) {
+                break;
+            }
+        }
         return productMatches;
     }
 
