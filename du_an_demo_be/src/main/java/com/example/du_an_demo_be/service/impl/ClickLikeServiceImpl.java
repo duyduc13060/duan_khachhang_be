@@ -32,7 +32,11 @@ public class ClickLikeServiceImpl implements ClickService {
     public ServiceResult<ClickLikeDto> clickLike(ClickLikeDto clickLikeDto){
         CustomerDetailService customer = CurrentUserUtils.getCurrentUserUtils();
 
-        Optional<ClickLikeEntity> findByUsernameLike = this.clickLikeRepository.findByUsernameLike(customer.getUsername());
+        Optional<ClickLikeEntity> findByUsernameLike = this.clickLikeRepository
+                .findByUsernameLikeAndPromptId(
+                        customer.getUsername(),
+                        clickLikeDto.getPromptId()
+                );
 
         // todo: đã like nếu click vào thì thực hiện xóa
         if(findByUsernameLike.isPresent()){
