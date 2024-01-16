@@ -13,7 +13,7 @@ import java.net.URISyntaxException;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/QLR")
 @RequiredArgsConstructor
 public class FunctionControler {
 
