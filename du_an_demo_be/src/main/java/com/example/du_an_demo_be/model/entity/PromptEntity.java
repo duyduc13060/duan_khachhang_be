@@ -18,6 +18,7 @@ public class PromptEntity {
 
     private Long promptTypeId;
 
+    @Column(name = "description_use", columnDefinition = "LONGTEXT")
     private String descriptionUse;
 
     @Column(name = "prompt_name", columnDefinition = "LONGTEXT")
