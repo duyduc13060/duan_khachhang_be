@@ -2,10 +2,13 @@ package com.example.du_an_demo_be.controller;
 
 
 import com.example.du_an_demo_be.model.dto.ReviewDto;
+import com.example.du_an_demo_be.model.dto.UserDto;
 import com.example.du_an_demo_be.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -15,12 +18,17 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @GetMapping("/detail")
+    @PostMapping("/get-list-reviews")
     public ResponseEntity<?> getListReviewUser(
-            @RequestParam("messageId") Long messageId
-    ){
-        return ResponseEntity.ok().body(reviewService.getListReviewUser(messageId));
+            @RequestBody Map<String, String> requestBody
+    ) {
+        String username = requestBody.get("username");
+        String userrole = requestBody.get("userrole");
+
+        return ResponseEntity.ok().body(reviewService.getListReviewUser(username, userrole));
     }
+
+
 
     @PostMapping("/create")
     public ResponseEntity<?> createReview(

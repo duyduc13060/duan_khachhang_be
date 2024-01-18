@@ -25,18 +25,27 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final ModelMapper modelMapper;
     private final MessageRepository messageRepository;
+    private final String ROLE_ADMIN = "ADMIN";
 
     @Override
-    public DefaultResponse<List<ReviewDto>> getListReviewUser(Long messageId){
-        CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
+    public DefaultResponse<List<ReviewDto>> getListReviewUser(String userName, String userRole) {
+//        CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
 
-        List<ReviewDto> reviewDtoList = reviewRepository.findAllByCreateNameAndMessageId(customerDetailService.getUsername() ,messageId)
-                .stream()
-                .map(item -> modelMapper.map(item,ReviewDto.class))
-                .collect(Collectors.toList());
-
-        return DefaultResponse.success("success",reviewDtoList);
+        List<ReviewDto> reviewDtoList;
+        if (userRole.equals(ROLE_ADMIN)) {
+            reviewDtoList = reviewRepository.findAllByRoleAdmin()
+                    .stream()
+                    .map(item -> modelMapper.map(item, ReviewDto.class))
+                    .collect(Collectors.toList());
+        } else {
+            reviewDtoList = reviewRepository.findAllByUser(userName)
+                    .stream()
+                    .map(item -> modelMapper.map(item, ReviewDto.class))
+                    .collect(Collectors.toList());
+        }
+        return DefaultResponse.success("success", reviewDtoList);
     }
+
 
 
     @Override
