@@ -180,7 +180,6 @@ public class DataUtil {
      * @param obj1
      * @param defaultValue
      * @return
-     * @author phuvk
      */
     public static int safeToInt(Object obj1, int defaultValue) {
         int result = defaultValue;

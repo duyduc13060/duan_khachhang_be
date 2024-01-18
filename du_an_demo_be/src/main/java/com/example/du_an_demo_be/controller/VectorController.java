@@ -96,4 +96,10 @@ public class VectorController {
         return ResponseEntity.ok().body(this.vectorSearchService.processSearch(elasticSearchDto.getDocument()));
     }
 
+    @DeleteMapping("/delete/message_index")
+    public ResponseEntity<?> deleteDocument() {
+        vectorSearchService.deleteDocumentIndex();
+        return ResponseEntity.ok().body("Xóa thành công");
+    }
+
 }

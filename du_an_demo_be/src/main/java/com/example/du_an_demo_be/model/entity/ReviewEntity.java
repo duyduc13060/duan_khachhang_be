@@ -26,4 +26,13 @@ public class ReviewEntity {
 
     private Long messageId;
 
+    @Column(name = "message_response",  columnDefinition = "LONGTEXT")
+    private String messageResponse;
+
+    @Column(name = "message_request",  columnDefinition = "LONGTEXT")
+    private String messageRequest;
+
+    private String  rating;
+
+    private String  type;
 }

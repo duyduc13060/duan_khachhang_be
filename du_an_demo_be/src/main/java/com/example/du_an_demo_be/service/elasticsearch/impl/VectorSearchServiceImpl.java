@@ -10,10 +10,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.IndexedObjectInformation;
-import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.*;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
@@ -33,12 +30,13 @@ public class VectorSearchServiceImpl implements VectorSearchService {
     private final ElasticsearchVectorRepository elasticsearchVectorRepository;
     private final ElasticsearchOperations elasticsearchOperations;
     private static final String MESSAGE_INDEX = "message_index";
+    private static final int TRUNK_SIZE = 500;
 
     @Override
     public List<IndexedObjectInformation> createProductIndexBulk
             (final String content) {
 
-        List<String> trunks = this.splitIntoTrunks1(content, 1000);
+        List<String> trunks = this.splitIntoTrunks1(content, TRUNK_SIZE);
         List<VectorEntity> vectorEntities = new ArrayList<>();
 
         trunks.forEach(item ->{
@@ -68,7 +66,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
 
     @Override
     public List<String> createProductIndex(String content) {
-        List<String> trunks = this.splitIntoTrunks1(content, 1000);
+        List<String> trunks = this.splitIntoTrunks1(content, TRUNK_SIZE);
         List<String> documentIds = new ArrayList<>();
 
         trunks.forEach(item ->{
@@ -185,12 +183,21 @@ public class VectorSearchServiceImpl implements VectorSearchService {
         int i = 0;
         for (SearchHit<VectorEntity> searchHit : productHits) {
             productMatches.add(searchHit.getContent());
-            if (productMatches.size() > 4) {
+            if (productMatches.size() > 10) {
                 break;
             }
         }
         return productMatches;
     }
 
+    public void deleteDocumentIndex() {
+        try {
+            IndexOperations indexOperations = elasticsearchOperations.indexOps(IndexCoordinates.of(MESSAGE_INDEX));
+            indexOperations.delete();
+            System.out.println("Ducuments index deleted!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }
