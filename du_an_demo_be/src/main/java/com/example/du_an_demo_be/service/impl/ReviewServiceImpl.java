@@ -50,6 +50,10 @@ public class ReviewServiceImpl implements ReviewService {
         ReviewEntity reviewEntity = modelMapper.map(reviewDto,ReviewEntity.class);
         reviewEntity.setCreateName(customerDetailService.getUsername());
         reviewEntity.setMessageId(messageEntity.get().getId());
+        reviewEntity.setMessageRequest(messageEntity.get().getContentRequest());
+        reviewEntity.setMessageResponse(messageEntity.get().getContentResponse());
+        reviewEntity.setRating(reviewDto.getRating());
+        reviewEntity.setType(reviewDto.getType());
 
         return DefaultResponse.success("success",modelMapper.map(
                 reviewRepository.save(reviewEntity),ReviewDto.class)

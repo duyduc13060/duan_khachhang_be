@@ -27,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ChatBoxServiceImpl implements ChatBoxService {
@@ -95,13 +96,12 @@ public class ChatBoxServiceImpl implements ChatBoxService {
         DefaultResponse<ResultApiChatBox> resultApiChatBoxDefaultResponse = new DefaultResponse<>();
         ResultApiChatBox resultApiChatBox = new ResultApiChatBox();
 
-//        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-//
-//        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.53.120.10", 8080));
-//        requestFactory.setProxy(proxy);
-//        RestTemplate restTemplate = new RestTemplate(requestFactory);
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 
-        RestTemplate restTemplate = new RestTemplate();
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.53.120.10", 8080));
+        requestFactory.setProxy(proxy);
+
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
 
         try {
             restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -201,14 +201,18 @@ public class ChatBoxServiceImpl implements ChatBoxService {
         JSONObject jsonObject = new JSONObject();
 
         // todo: đoạn code này dùng để set proxy
-//        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-//        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.53.120.10", 8080));
-//        requestFactory.setProxy(proxy);
-//
-//        OkHttpClient.Builder builder = new OkHttpClient.Builder().proxy(proxy);
-//        OkHttpClient client = builder.build();
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.53.120.10", 8080));
+        requestFactory.setProxy(proxy);
 
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient.Builder builder = new OkHttpClient.Builder().proxy(proxy)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .callTimeout(60, TimeUnit.SECONDS);
+        OkHttpClient client = builder.build();
+
+//        OkHttpClient client = new OkHttpClient();
 
         okhttp3.MediaType mediaType = okhttp3.MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, new Gson().toJson(chatBoxRequest));

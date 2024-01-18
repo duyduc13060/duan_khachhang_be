@@ -14,4 +14,6 @@ public interface VectorSearchService {
     List<String> fetchSuggestions(String query);
 
     List<VectorEntity> processSearch(String query);
+
+    void deleteDocumentIndex();
 }

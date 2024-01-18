@@ -10,4 +10,8 @@ public class ReviewDto {
     private LocalDateTime createDate;
     private String createName;
     private Long messageId;
+    private String messageResponse;
+    private String messageRequest;
+    private String rating;
+    private String type;
 }
