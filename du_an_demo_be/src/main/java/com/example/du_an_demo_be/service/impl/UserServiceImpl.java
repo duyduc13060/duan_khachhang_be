@@ -15,14 +15,14 @@ import com.example.du_an_demo_be.until.CurrentUserUtils;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -52,25 +52,32 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ServiceResult<SearchResponseDTO> search(SearchDTO<UserDto> searchDTO){
-        ServiceResult<SearchResponseDTO> dataResult = new ServiceResult<>();
+    public ServiceResult<Page<UserDto>> search(SearchDTO<UserDto> searchDTO){
 
         List<UserDto> listUserDto = userCustomRepository.searchUser(searchDTO);
 
-        dataResult.setMessage("thành công");
-        dataResult.setStatus(HttpStatus.OK);
+        int start = searchDTO.getPage() * searchDTO.getPageSize();
+        int end = Math.min(start + searchDTO.getPageSize(), listUserDto.size());
 
-        SearchResponseDTO searchResponseDTO = new SearchResponseDTO(0L, listUserDto, 0, searchDTO.getPage(), searchDTO.getPageSize());
-        if(listUserDto.size() > 0){
-            searchResponseDTO.setTotal(listUserDto.get(0).getTotal());
+        if (start <= end) {
+            List<UserDto> content = listUserDto.subList(start, end);
+            Page<UserDto> userDtoPage = new PageImpl<>(
+                    content,
+                    PageRequest.of(searchDTO.getPage(), searchDTO.getPageSize()),
+                    listUserDto.size()
+            );
+            return new ServiceResult<>(
+                    userDtoPage,
+                    HttpStatus.OK,
+                    "success")
+                    ;
+        } else {
+            System.out.println("Invalid start and end values.");
+            return new ServiceResult<>(
+                    new PageImpl<>(Collections.emptyList(), PageRequest.of(searchDTO.getPage(), searchDTO.getPageSize()), 0),
+                    HttpStatus.BAD_REQUEST,"Fail"
+            );
         }
-
-        if(searchResponseDTO.getPageSize() != null && searchResponseDTO.getPageSize() > 0){
-            searchResponseDTO.setTotalPage((int) Math.ceil(searchResponseDTO.getTotal() / searchResponseDTO.getPageSize().doubleValue()));
-        }
-
-        dataResult.setData(searchResponseDTO);
-        return dataResult;
     }
 
     @Override

@@ -37,25 +37,14 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 "   u.username,\n" +
                 "   u.status,\n" +
                 "   u.email,\n" +
-                "   r.name as roleName,\n" +
-                "   COUNT(*) OVER() \"total\" \n" +
+                "   r.name as roleName \n" +
                 "FROM users u\n" +
                 "left join roles r on r.id = u.role_id\n" +
                 "where (\t(1 = 1  \n" +
                 "\t\tAND ( :status is null or u.status = :status)\n" +
                 "\t\tAND ( :keySearch is null or u.username like CONCAT('%', :keySearch, '%') OR u.fullname like CONCAT('%', :keySearch, '%'))\t\t\n" +
-                ")) \n");
-
-
-        if (searchDTO.getPage() != null && searchDTO.getPageSize() != null) {
-            Integer offset;
-            if (searchDTO.getPage() <= 1) {
-                offset = 0;
-            } else {
-                offset = (searchDTO.getPage() - 1) * searchDTO.getPageSize();
-            }
-            sql.append("\t\t LIMIT " + offset + " , " + searchDTO.getPageSize() + " ");
-        }
+                ")) \n" +
+                "order by u.id DESC \n");
 
         Query query = entityManager.createNativeQuery(sql.toString());
         query.setParameter("status", userDto.getStatus());
@@ -76,7 +65,6 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 userDto1.setStatus(DataUtil.safeToInt(obj[7]));
                 userDto1.setEmail(DataUtil.safeToString(obj[8]));
                 userDto1.setRoleName(DataUtil.safeToString(obj[9]));
-                userDto1.setTotal(DataUtil.safeToLong(obj[10]));
                 userDtoList.add(userDto1);
             }
         }

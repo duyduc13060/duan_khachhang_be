@@ -5,6 +5,7 @@ import com.example.du_an_demo_be.payload.request.SearchDTO;
 import com.example.du_an_demo_be.payload.response.DefaultResponse;
 import com.example.du_an_demo_be.payload.response.SearchResponseDTO;
 import com.example.du_an_demo_be.payload.response.ServiceResult;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface UserService {
     //todo: Lấy ra danh sách user
     DefaultResponse<?> getListUser();
 
-    ServiceResult<SearchResponseDTO> search(SearchDTO<UserDto> searchDTO);
+    ServiceResult<Page<UserDto>> search(SearchDTO<UserDto> searchDTO);
 
     DefaultResponse<?> createUser(UserDto userDto);
 

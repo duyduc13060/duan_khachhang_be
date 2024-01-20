@@ -42,7 +42,8 @@ public interface PromptRepository extends JpaRepository<PromptEntity,Long> {
             " AND(:promptTypeId IS NULL OR pt.promptTypeId = :promptTypeId) " +
             " AND(:promptName IS NULL OR pt.promptName LIKE CONCAT('%', :promptName, '%') OR pt.descriptionUse LIKE CONCAT('%', :promptName, '%')) " +
             " and (:createDate is null or STR_TO_DATE(DATE_FORMAT(pt.createDate, '%Y/%m/%d'), '%Y/%m/%d') = STR_TO_DATE(:createDate , '%Y/%m/%d')) " +
-            ") "
+            ") " +
+            "ORDER BY pt.id DESC"
     )
     Page<PromptDto> searchPrompt(
             @Param("promptTypeId") Long promptTypeId,
