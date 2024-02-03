@@ -1,5 +1,6 @@
 package com.example.du_an_demo_be.service.impl;
 
+import com.example.du_an_demo_be.payload.request.ChatBoxGeminiProRequest;
 import com.example.du_an_demo_be.payload.request.ChatBoxRequest;
 import com.example.du_an_demo_be.payload.request.amazon.ChatBoxAmazonRequest;
 import com.example.du_an_demo_be.payload.response.ChatBoxResponse;
@@ -194,6 +195,56 @@ public class ChatBoxServiceImpl implements ChatBoxService {
 
     @Override
     public DefaultResponse<ResultApiChatBox> chatBoxTest(ChatBoxAmazonRequest chatBoxRequest, String UrlApi){
+
+        DefaultResponse<ResultApiChatBox> resultApiChatBoxDefaultResponse = new DefaultResponse<>();
+        ResultApiChatBox resultApiChatBox = new ResultApiChatBox();
+
+        JSONObject jsonObject = new JSONObject();
+
+        // todo: đoạn code này dùng để set proxy
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.53.120.10", 8080));
+        requestFactory.setProxy(proxy);
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder().proxy(proxy)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .callTimeout(60, TimeUnit.SECONDS);
+        OkHttpClient client = builder.build();
+
+//        OkHttpClient client = new OkHttpClient();
+
+        okhttp3.MediaType mediaType = okhttp3.MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(mediaType, new Gson().toJson(chatBoxRequest));
+
+        Request request = new Request.Builder()
+                .url(UrlApi)
+                .post(body)
+                .addHeader("accept", "application/json")
+                .addHeader("content-type", "application/json")
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            // Xử lý dữ liệu response ở đây
+            String responseBody = response.body().string();
+            jsonObject = new JSONObject(Objects.requireNonNull(responseBody));
+            resultApiChatBox.setJsonObject(jsonObject);
+            resultApiChatBox.setJsonObjectString(responseBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultApiChatBoxDefaultResponse.setSuccess(HttpStatus.BAD_REQUEST.value());
+        }
+
+        resultApiChatBoxDefaultResponse.setSuccess(HttpStatus.OK.value());
+        resultApiChatBoxDefaultResponse.setData(resultApiChatBox);
+
+        return resultApiChatBoxDefaultResponse;
+    }
+
+    @Override
+    public DefaultResponse<ResultApiChatBox> chatBoxGeminiPro(ChatBoxGeminiProRequest chatBoxRequest, String UrlApi){
 
         DefaultResponse<ResultApiChatBox> resultApiChatBoxDefaultResponse = new DefaultResponse<>();
         ResultApiChatBox resultApiChatBox = new ResultApiChatBox();

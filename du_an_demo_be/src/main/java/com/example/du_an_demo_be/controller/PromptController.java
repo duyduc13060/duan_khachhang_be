@@ -43,6 +43,4 @@ public class PromptController {
         this.promptService.deletePrompt(idPrompt);
         return ResponseEntity.ok().body("Xóa thành công");
     }
-
-
 }

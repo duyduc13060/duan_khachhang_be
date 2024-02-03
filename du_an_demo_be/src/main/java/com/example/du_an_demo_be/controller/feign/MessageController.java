@@ -1,6 +1,7 @@
 package com.example.du_an_demo_be.controller.feign;
 
 
+import com.example.du_an_demo_be.payload.request.ChatBoxGeminiProRequest;
 import com.example.du_an_demo_be.payload.request.ChatBoxRequest;
 import com.example.du_an_demo_be.payload.request.amazon.ChatBoxAmazonRequest;
 import com.example.du_an_demo_be.service.MessageService;
@@ -38,6 +39,9 @@ public class MessageController {
         return   ResponseEntity.ok().body(messageService.saveMessageChatBoxAmazon(chatBoxRequest));
     }
 
-
+    @PostMapping("/generate-message-gemini-pro")
+    public ResponseEntity<?> sendMessage(@RequestBody ChatBoxGeminiProRequest chatBoxRequest){
+        return   ResponseEntity.ok().body(messageService.saveMessageChatBoxGeminiPro(chatBoxRequest));
+    }
 
 }

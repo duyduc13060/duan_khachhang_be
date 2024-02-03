@@ -1,5 +1,6 @@
 package com.example.du_an_demo_be.service;
 
+import com.example.du_an_demo_be.payload.request.ChatBoxGeminiProRequest;
 import com.example.du_an_demo_be.payload.request.ChatBoxRequest;
 import com.example.du_an_demo_be.payload.request.amazon.ChatBoxAmazonRequest;
 import com.example.du_an_demo_be.payload.response.DefaultResponse;
@@ -13,4 +14,6 @@ public interface ChatBoxService {
     DefaultResponse<ResultApiChatBox> chatBoxAmazon(ChatBoxAmazonRequest chatBoxRequest, String UrlApi);
 
     DefaultResponse<ResultApiChatBox> chatBoxTest(ChatBoxAmazonRequest chatBoxRequest, String UrlApi);
+
+    DefaultResponse<ResultApiChatBox> chatBoxGeminiPro(ChatBoxGeminiProRequest chatBoxRequest, String UrlApi);
 }

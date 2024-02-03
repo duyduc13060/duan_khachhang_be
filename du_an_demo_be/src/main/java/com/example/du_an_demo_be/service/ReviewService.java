@@ -9,4 +9,6 @@ public interface ReviewService {
     DefaultResponse<List<ReviewDto>> getListReviewUser(String userName, String userRole);
 
     DefaultResponse<ReviewDto> createReview(ReviewDto reviewDto);
+
+    void deleteReview(Long reviewId);
 }

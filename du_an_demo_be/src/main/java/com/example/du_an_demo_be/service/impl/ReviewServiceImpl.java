@@ -1,8 +1,10 @@
 package com.example.du_an_demo_be.service.impl;
 
 import com.example.du_an_demo_be.exception.BadRequestException;
+import com.example.du_an_demo_be.exception.NotFoundException;
 import com.example.du_an_demo_be.model.dto.ReviewDto;
 import com.example.du_an_demo_be.model.entity.MessageEntity;
+import com.example.du_an_demo_be.model.entity.PromptEntity;
 import com.example.du_an_demo_be.model.entity.ReviewEntity;
 import com.example.du_an_demo_be.payload.response.DefaultResponse;
 import com.example.du_an_demo_be.repository.MessageRepository;
@@ -12,6 +14,7 @@ import com.example.du_an_demo_be.service.ReviewService;
 import com.example.du_an_demo_be.until.CurrentUserUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -69,5 +72,10 @@ public class ReviewServiceImpl implements ReviewService {
         );
     }
 
-
+    @Override
+    public void deleteReview(Long reviewId){
+        ReviewEntity reviewFindById = this.reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new NotFoundException(HttpStatus.NOT_FOUND.value(), "Review ID not found: " + reviewId));
+        this.reviewRepository.deleteById(reviewFindById.getId());
+    }
 }
