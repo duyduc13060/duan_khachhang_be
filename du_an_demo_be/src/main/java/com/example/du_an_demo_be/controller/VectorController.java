@@ -93,7 +93,7 @@ public class VectorController {
     public ResponseEntity<?> fetchSuggestions(
             @RequestBody ElasticSearchDto elasticSearchDto
             ){
-        return ResponseEntity.ok().body(this.vectorSearchService.processSearch(elasticSearchDto.getDocument()));
+        return ResponseEntity.ok().body(this.vectorSearchService.processSearch(elasticSearchDto.getContent()));
     }
 
     @DeleteMapping("/delete/message_index")

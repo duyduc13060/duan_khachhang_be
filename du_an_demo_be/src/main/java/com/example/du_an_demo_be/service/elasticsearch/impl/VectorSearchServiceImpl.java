@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,7 +50,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
                     Calendar.getInstance().get(Calendar.HOUR) +
                     Calendar.getInstance().get(Calendar.MINUTE) +
                     Calendar.getInstance().get(Calendar.MILLISECOND));
-            vector.setDocument(content);
+            vector.setContent(content);
 
             vectorEntities.add(vector);
         });
@@ -65,9 +66,10 @@ public class VectorSearchServiceImpl implements VectorSearchService {
     }
 
     @Override
-    public List<String> createProductIndex(String content) {
+    public List<String> createProductIndex(String content, String fileName) {
         List<String> trunks = this.splitIntoTrunks1(content, TRUNK_SIZE);
         List<String> documentIds = new ArrayList<>();
+        AtomicInteger count = new AtomicInteger(1);
 
         trunks.forEach(item ->{
             VectorEntity vectorEntities = new VectorEntity();
@@ -79,7 +81,9 @@ public class VectorSearchServiceImpl implements VectorSearchService {
                     Calendar.getInstance().get(Calendar.HOUR) +
                     Calendar.getInstance().get(Calendar.MINUTE) +
                     Calendar.getInstance().get(Calendar.MILLISECOND));
-            vectorEntities.setDocument(item);
+            vectorEntities.setContent(item);
+            vectorEntities.setFileName(fileName);
+            vectorEntities.setTrunkCount(count.intValue());
 
             IndexQuery indexQuery = new IndexQueryBuilder()
                     .withId(vectorEntities.getId())
@@ -89,6 +93,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
                     .index(indexQuery, IndexCoordinates.of(MESSAGE_INDEX));
 
             documentIds.add(documentId);
+            count.getAndIncrement();
 
         });
         return documentIds;
@@ -109,7 +114,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
     @Override
     public List<String> fetchSuggestions(String query) {
         QueryBuilder queryBuilder = QueryBuilders
-                .wildcardQuery("document", query + "*");
+                .wildcardQuery("content", query + "*");
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withFilter(queryBuilder)
@@ -124,7 +129,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
         List<String> suggestions = new ArrayList<String>();
 
         searchSuggestions.getSearchHits().forEach(searchHit->{
-            suggestions.add(searchHit.getContent().getDocument());
+            suggestions.add(searchHit.getContent().getContent());
         });
         return suggestions;
     }
@@ -132,33 +137,10 @@ public class VectorSearchServiceImpl implements VectorSearchService {
 
     @Override
     public List<VectorEntity> processSearch(final String query) {
-
-//        // 1. Create query on multiple fields enabling fuzzy search
-//        QueryBuilder queryBuilder =
-//                QueryBuilders
-//                        .multiMatchQuery(query, "document", "description")
-//                        .fuzziness(Fuzziness.AUTO);
-//
-//        Query searchQuery = new NativeSearchQueryBuilder()
-//                .withFilter(queryBuilder)
-//                .build();
-//
-//        // 2. Execute search
-//        SearchHits<VectorEntity> productHits =
-//                elasticsearchOperations
-//                        .search(searchQuery, VectorEntity.class,
-//                                IndexCoordinates.of(MESSAGE_INDEX));
-//
-//        // 3. Map searchHits to product list
-//        List<VectorEntity> productMatches = new ArrayList<VectorEntity>();
-//        productHits.forEach(searchHit->{
-//            productMatches.add(searchHit.getContent());
-//        });
-//        return productMatches;
         // 1. Create query on multiple fields enabling fuzzy search
         QueryBuilder queryBuilder =
                 QueryBuilders
-                        .multiMatchQuery(query, "document", "description")
+                        .multiMatchQuery(query, "content", "description")
                         .fuzziness(Fuzziness.AUTO);
 
         Query searchQuery = new NativeSearchQueryBuilder()
@@ -173,21 +155,62 @@ public class VectorSearchServiceImpl implements VectorSearchService {
                                 IndexCoordinates.of(MESSAGE_INDEX));
 
         // 3. Map searchHits to product list
-//        List<VectorEntity> productMatches = new ArrayList<VectorEntity>();
-//        int i = 0;
-//        productHits.forEach(searchHit->{
-//            productMatches.add(searchHit.getContent());
-//        });
-        // 3. Map searchHits to product list
         List<VectorEntity> productMatches = new ArrayList<VectorEntity>();
+        productMatches.add(productHits.getSearchHit(0).getContent());
+        int trunkCount = productHits.getSearchHit(0).getContent().getTrunkCount();
+
+        for (int i = 1; i < productHits.getSearchHits().size(); i++) {
+            VectorEntity vectorEntity = productHits.getSearchHit(i).getContent();
+            if (trunkCount == 1 && vectorEntity.getTrunkCount() == 2) {
+                productMatches.add(vectorEntity);
+                break;
+            } else if (trunkCount > 1 && (vectorEntity.getTrunkCount() == trunkCount - 1 || vectorEntity.getTrunkCount() == trunkCount + 1)) {
+                productMatches.add(vectorEntity);
+                if (productMatches.size() == 3) {
+                    break;
+                }
+            }
+        }
+
+//        int i = 0;
+//        for (SearchHit<VectorEntity> searchHit : productHits) {
+//            productMatches.add(searchHit.getContent());
+//            if (productMatches.size() > 10) {
+//                break;
+//            }
+//        }
+        return productMatches;
+    }
+
+    @Override
+    public List<VectorEntity> searchPassageRetrieval(final String query) {
+        // 1. Tạo truy vấn tìm kiếm các đoạn văn phù hợp với truy vấn
+        QueryBuilder queryBuilder = QueryBuilders
+                .multiMatchQuery(query, "content", "description")
+                .fuzziness(Fuzziness.AUTO);
+
+        Query searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(queryBuilder)
+                .withSort(SortBuilders.scoreSort().order(SortOrder.DESC))
+                .build();
+
+        // 2. Thực thi truy vấn tìm kiếm
+        SearchHits<VectorEntity> searchHits =
+                elasticsearchOperations
+                        .search(searchQuery, VectorEntity.class,
+                                IndexCoordinates.of(MESSAGE_INDEX));
+
+        // 3. Chuyển đổi SearchHits thành danh sách các đoạn văn
+        List<VectorEntity> passages = new ArrayList<>();
         int i = 0;
-        for (SearchHit<VectorEntity> searchHit : productHits) {
-            productMatches.add(searchHit.getContent());
-            if (productMatches.size() > 10) {
+        for (SearchHit<VectorEntity> searchHit : searchHits) {
+            passages.add(searchHit.getContent());
+            if (passages.size() > 10) {
                 break;
             }
         }
-        return productMatches;
+
+        return passages;
     }
 
     public void deleteDocumentIndex() {

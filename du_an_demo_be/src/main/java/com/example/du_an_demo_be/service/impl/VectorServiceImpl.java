@@ -128,6 +128,9 @@ public class VectorServiceImpl implements VectorService {
             String content = "";
             InputStream inputStream = file.getInputStream();
 
+            String fileName = file.getOriginalFilename();
+            System.out.println("File Name: " + fileName);
+
             // Create a metadata object to hold document metadata
             Metadata metadata = new Metadata();
 
@@ -148,19 +151,7 @@ public class VectorServiceImpl implements VectorService {
 
             if(!content.isEmpty() || content != null){
                 //todo: lưu data trong file vào vector
-//                VectorEntity vector = new VectorEntity();
-//                vector.setId("vector_" +
-//                        Calendar.getInstance().get(Calendar.YEAR) +
-//                        (Calendar.getInstance().get(Calendar.MONTH) + 1) +
-//                        Calendar.getInstance().get(Calendar.DATE) +
-//                        "_" +
-//                        Calendar.getInstance().get(Calendar.HOUR) +
-//                        Calendar.getInstance().get(Calendar.MINUTE) +
-//                        Calendar.getInstance().get(Calendar.MILLISECOND));
-//                vector.setDocument(content);
-
-                this.vectorSearchService.createProductIndex(content);
-//                this.vectorSearchService.createProductIndexBulk(content);
+                this.vectorSearchService.createProductIndex(content, fileName);
             }else{
                 throw new BadRequestException("Content is null");
             }

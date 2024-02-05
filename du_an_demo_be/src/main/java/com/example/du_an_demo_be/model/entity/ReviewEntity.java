@@ -35,4 +35,6 @@ public class ReviewEntity {
     private String  rating;
 
     private String  type;
+
+    private String  modelName;
 }

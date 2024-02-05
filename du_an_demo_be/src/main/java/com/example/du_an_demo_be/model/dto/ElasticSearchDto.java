@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class ElasticSearchDto {
 
-    private String document;
+    private String content;
 
 }

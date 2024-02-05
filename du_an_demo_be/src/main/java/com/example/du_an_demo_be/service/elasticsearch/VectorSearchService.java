@@ -9,11 +9,13 @@ public interface VectorSearchService {
     List<IndexedObjectInformation> createProductIndexBulk
             (String content);
 
-    List<String> createProductIndex(String content);
+    List<String> createProductIndex(String content, String fileName);
 
     List<String> fetchSuggestions(String query);
 
     List<VectorEntity> processSearch(String query);
 
     void deleteDocumentIndex();
+
+    List<VectorEntity> searchPassageRetrieval(final String query);
 }

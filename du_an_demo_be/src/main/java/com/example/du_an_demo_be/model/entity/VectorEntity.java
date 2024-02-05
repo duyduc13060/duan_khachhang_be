@@ -15,8 +15,12 @@ public class VectorEntity {
     @Id
     private String id;
 
-    @Field(type = FieldType.Text, name = "document")
-    private String document;
+    @Field(type = FieldType.Text, name = "content")
+    private String content;
 
+    @Field(type = FieldType.Text, name = "file_name")
+    private String fileName;
 
+    @Field(type = FieldType.Integer, name = "trunk_count")
+    private int trunkCount;
 }
