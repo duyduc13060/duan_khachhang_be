@@ -18,4 +18,6 @@ public interface VectorSearchService {
     void deleteDocumentIndex();
 
     List<VectorEntity> searchPassageRetrieval(final String query);
+
+    String getFileContent(String fileName);
 }

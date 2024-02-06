@@ -6,5 +6,5 @@ import lombok.Data;
 public class ElasticSearchDto {
 
     private String content;
-
+    private String filename;
 }

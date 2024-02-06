@@ -47,7 +47,7 @@ public class MessageServiceImpl implements MessageService {
     @Value("https://oqt1iem2ub.execute-api.us-east-1.amazonaws.com/Product/bedrock")
     public String apiChatBoxAmazon;
 
-    @Value("https://generativela")
+    @Value("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyB8zxF5HGOxdhm4QIcJAp_j_8C3CACOXO0")
     public String apiChatBoxGeminiPro;
 
     @Override

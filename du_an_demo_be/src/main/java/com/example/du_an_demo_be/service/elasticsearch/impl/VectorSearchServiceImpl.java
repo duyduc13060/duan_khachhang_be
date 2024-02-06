@@ -213,6 +213,32 @@ public class VectorSearchServiceImpl implements VectorSearchService {
         return passages;
     }
 
+    @Override
+    public String getFileContent(String fileName) {
+        // Tạo truy vấn tìm kiếm các index có cùng "fileName"
+        QueryBuilder queryBuilder = QueryBuilders.matchQuery("file_name", fileName);
+
+        // Sắp xếp theo "trunkCount" tăng dần
+        Query searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(queryBuilder)
+                .withSort(SortBuilders.fieldSort("trunk_count").order(SortOrder.ASC))
+                .build();
+
+        // Thực thi truy vấn tìm kiếm
+        SearchHits<VectorEntity> searchHits =
+                elasticsearchOperations
+                        .search(searchQuery, VectorEntity.class,
+                                IndexCoordinates.of(MESSAGE_INDEX));
+
+        // Lấy ra nội dung "content" từ các index và cộng chuỗi lại
+        StringBuilder fileContent = new StringBuilder();
+        for (SearchHit<VectorEntity> searchHit : searchHits) {
+            fileContent.append(searchHit.getContent().getContent());
+        }
+
+        return fileContent.toString();
+    }
+
     public void deleteDocumentIndex() {
         try {
             IndexOperations indexOperations = elasticsearchOperations.indexOps(IndexCoordinates.of(MESSAGE_INDEX));
