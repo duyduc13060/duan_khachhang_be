@@ -12,7 +12,7 @@ import com.example.du_an_demo_be.payload.response.amazon.ChatBoxAmazonResponse;
 import java.util.List;
 
 public interface MessageService {
-    List<MessageDto> getListMessage();
+    List<MessageDto> getListMessage(Integer type);
 
     ServiceResult<ChatBoxResponse> saveMessage(ChatBoxRequest chatBoxRequest);
 

@@ -18,8 +18,10 @@ public class MessageController {
     private final MessageService messageService;
 
     @GetMapping("/get-message")
-    public ResponseEntity<?> getMessage(){
-        return ResponseEntity.ok().body(messageService.getListMessage());
+    public ResponseEntity<?> getMessage(
+            @RequestParam(value = "type") Integer type
+    ){
+        return ResponseEntity.ok().body(messageService.getListMessage(type));
     }
 
 //    @PostMapping("/generate-message")

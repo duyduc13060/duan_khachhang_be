@@ -2,6 +2,8 @@ package com.example.du_an_demo_be.controller;
 
 
 import com.example.du_an_demo_be.model.dto.ElasticSearchDto;
+import com.example.du_an_demo_be.model.dto.UserDto;
+import com.example.du_an_demo_be.payload.request.SearchDTO;
 import com.example.du_an_demo_be.service.VectorService;
 import com.example.du_an_demo_be.service.elasticsearch.VectorSearchService;
 import lombok.RequiredArgsConstructor;
@@ -61,5 +63,20 @@ public class VectorController {
         responseBody.put("fileContent", fileContent);
         responseBody.put("status", "success");
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
+    }
+
+    @PostMapping("/search/vector/creator")
+    public ResponseEntity<?> searchCreator(
+            @RequestBody SearchDTO<ElasticSearchDto> searchDTO
+    ){
+        return ResponseEntity.ok().body(this.vectorSearchService.searchPassageRetrieval(searchDTO));
+    }
+
+    @DeleteMapping("/delete/vector/filename")
+    public ResponseEntity<?> deleteFilename(
+            @RequestParam("filename") String filename
+    ){
+        this.vectorSearchService.deleteByFileName(filename);
+        return ResponseEntity.ok().body("success");
     }
 }

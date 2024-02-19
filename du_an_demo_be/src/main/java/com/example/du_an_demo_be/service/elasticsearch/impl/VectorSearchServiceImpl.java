@@ -1,14 +1,23 @@
 package com.example.du_an_demo_be.service.elasticsearch.impl;
 
+import com.example.du_an_demo_be.model.dto.ElasticSearchDto;
 import com.example.du_an_demo_be.model.entity.VectorEntity;
+import com.example.du_an_demo_be.payload.request.SearchDTO;
+import com.example.du_an_demo_be.payload.response.ServiceResult;
 import com.example.du_an_demo_be.repository.elasticsearch.ElasticsearchVectorRepository;
+import com.example.du_an_demo_be.security.CustomerDetailService;
 import com.example.du_an_demo_be.service.elasticsearch.VectorSearchService;
+import com.example.du_an_demo_be.until.CurrentUserUtils;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.*;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
@@ -16,11 +25,10 @@ import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -70,6 +78,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
         List<String> trunks = this.splitIntoTrunks1(content, TRUNK_SIZE);
         List<String> documentIds = new ArrayList<>();
         AtomicInteger count = new AtomicInteger(1);
+        CustomerDetailService customer = CurrentUserUtils.getCurrentUserUtils();
 
         trunks.forEach(item ->{
             VectorEntity vectorEntities = new VectorEntity();
@@ -84,6 +93,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
             vectorEntities.setContent(item);
             vectorEntities.setFileName(fileName);
             vectorEntities.setTrunkCount(count.intValue());
+            vectorEntities.setCreator(customer.getUsername());
 
             IndexQuery indexQuery = new IndexQueryBuilder()
                     .withId(vectorEntities.getId())
@@ -183,14 +193,19 @@ public class VectorSearchServiceImpl implements VectorSearchService {
     }
 
     @Override
-    public List<VectorEntity> searchPassageRetrieval(final String query) {
+    public ServiceResult<Page<VectorEntity>> searchPassageRetrieval(SearchDTO<ElasticSearchDto> searchDTO) {
         // 1. Tạo truy vấn tìm kiếm các đoạn văn phù hợp với truy vấn
         QueryBuilder queryBuilder = QueryBuilders
-                .multiMatchQuery(query, "content", "description")
+                .multiMatchQuery(searchDTO.getData().getCreator(),  "creator")
                 .fuzziness(Fuzziness.AUTO);
+
+        TermsAggregationBuilder aggregationBuilder = AggregationBuilders
+                .terms("group_by_fileName")
+                .field("file_name.keyword");
 
         Query searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(queryBuilder)
+                .addAggregation(aggregationBuilder)
                 .withSort(SortBuilders.scoreSort().order(SortOrder.DESC))
                 .build();
 
@@ -200,17 +215,49 @@ public class VectorSearchServiceImpl implements VectorSearchService {
                         .search(searchQuery, VectorEntity.class,
                                 IndexCoordinates.of(MESSAGE_INDEX));
 
-        // 3. Chuyển đổi SearchHits thành danh sách các đoạn văn
-        List<VectorEntity> passages = new ArrayList<>();
-        int i = 0;
+        Map<String, VectorEntity> resultMap = new HashMap<>();
         for (SearchHit<VectorEntity> searchHit : searchHits) {
-            passages.add(searchHit.getContent());
-            if (passages.size() > 10) {
-                break;
+            String fileName = searchHit.getContent().getFileName();
+
+            // Kiểm tra xem đã có VectorEntity cho fileName này trong Map chưa
+            if (resultMap.containsKey(fileName)) {
+                VectorEntity existingEntity = resultMap.get(fileName);
+                existingEntity.setContent(existingEntity.getContent() + "\n" + searchHit.getContent().getContent());
+                existingEntity.setCreator(searchHit.getContent().getCreator());
+            } else {
+                // Nếu chưa có, thêm mới VectorEntity vào Map
+                VectorEntity newEntity = new VectorEntity();
+                newEntity.setFileName(fileName);
+                newEntity.setContent(searchHit.getContent().getContent());
+                resultMap.put(fileName, newEntity);
             }
         }
 
-        return passages;
+        List<VectorEntity> passages = new ArrayList<>(resultMap.values());
+
+        int start = searchDTO.getPage() * searchDTO.getPageSize();
+        int end = Math.min(start + searchDTO.getPageSize(), passages.size());
+
+//        return passages;
+        if (start <= end) {
+            List<VectorEntity> content = passages.subList(start, end);
+            Page<VectorEntity> userDtoPage = new PageImpl<>(
+                    content,
+                    PageRequest.of(searchDTO.getPage(), searchDTO.getPageSize()),
+                    passages.size()
+            );
+            return new ServiceResult<>(
+                    userDtoPage,
+                    HttpStatus.OK,
+                    "success")
+                    ;
+        } else {
+            System.out.println("Invalid start and end values.");
+            return new ServiceResult<>(
+                    new PageImpl<>(Collections.emptyList(), PageRequest.of(searchDTO.getPage(), searchDTO.getPageSize()), 0),
+                    HttpStatus.BAD_REQUEST,"Fail"
+            );
+        }
     }
 
     @Override
@@ -248,5 +295,30 @@ public class VectorSearchServiceImpl implements VectorSearchService {
             e.printStackTrace();
         }
     }
+
+
+    @Override
+    public void deleteByFileName(String fileName) {
+        // Tạo truy vấn tìm kiếm để lấy danh sách các bản ghi cần xóa
+        Query searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(QueryBuilders.matchQuery("file_name.keyword", fileName))
+                .build();
+
+        // Thực hiện truy vấn tìm kiếm
+        SearchHits<VectorEntity> searchHits = elasticsearchOperations.search(searchQuery, VectorEntity.class,
+                IndexCoordinates.of(MESSAGE_INDEX));
+
+        List<String> idsToDelete = searchHits.stream()
+                .map(SearchHit::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if (!idsToDelete.isEmpty() && !idsToDelete.contains(null)) {
+            for (String id : idsToDelete) {
+                elasticsearchOperations.delete(id, IndexCoordinates.of(MESSAGE_INDEX));
+            }
+        }
+    }
+
 
 }
