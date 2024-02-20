@@ -18,6 +18,8 @@ public interface MessageService {
 
     ServiceResult<ChatBoxResponse> saveMessageRestTemplate(ChatBoxRequest chatBoxRequest);
 
+    ServiceResult<ChatBoxResponse> saveMessageRestTemplate1(ChatBoxRequest chatBoxRequest);
+
     ServiceResult<ChatBoxAmazonResponse> saveMessageChatBoxAmazon(ChatBoxAmazonRequest chatBoxRequest);
 
     ServiceResult<ChatBoxGeminiProResponse> saveMessageChatBoxGeminiPro(ChatBoxGeminiProRequest chatBoxRequest);
