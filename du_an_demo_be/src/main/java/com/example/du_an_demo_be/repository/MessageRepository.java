@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface MessageRepository extends JpaRepository<MessageEntity,Long> {
 
-    List<MessageEntity> getAllByCreator(String creator);
+    List<MessageEntity> getAllByCreatorAndType(String creator, Integer type);
 
 }

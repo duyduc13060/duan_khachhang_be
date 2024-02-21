@@ -18,8 +18,10 @@ public class MessageController {
     private final MessageService messageService;
 
     @GetMapping("/get-message")
-    public ResponseEntity<?> getMessage(){
-        return ResponseEntity.ok().body(messageService.getListMessage());
+    public ResponseEntity<?> getMessage(
+            @RequestParam(value = "type") Integer type
+    ){
+        return ResponseEntity.ok().body(messageService.getListMessage(type));
     }
 
 //    @PostMapping("/generate-message")
@@ -30,6 +32,12 @@ public class MessageController {
     @PostMapping("/generate-message")
     public ResponseEntity<?> sendMessage(@RequestBody ChatBoxRequest chatBoxRequest){
        return   ResponseEntity.ok().body(messageService.saveMessageRestTemplate(chatBoxRequest));
+    }
+
+
+    @PostMapping("/generate-message1")
+    public ResponseEntity<?> sendMessage1(@RequestBody ChatBoxRequest chatBoxRequest){
+        return   ResponseEntity.ok().body(messageService.saveMessageRestTemplate1(chatBoxRequest));
     }
 
 

@@ -7,4 +7,5 @@ public class ElasticSearchDto {
 
     private String content;
     private String filename;
+    private String creator;
 }

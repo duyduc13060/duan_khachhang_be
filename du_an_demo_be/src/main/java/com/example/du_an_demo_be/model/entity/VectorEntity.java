@@ -23,4 +23,15 @@ public class VectorEntity {
 
     @Field(type = FieldType.Integer, name = "trunk_count")
     private int trunkCount;
+
+    @Field(type = FieldType.Text, name = "creator")
+    private String creator;
+
+    public VectorEntity() {
+    }
+
+    public VectorEntity(String fileName, int trunkCount) {
+        this.fileName = fileName;
+        this.trunkCount = trunkCount;
+    }
 }

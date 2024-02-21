@@ -51,10 +51,10 @@ public class MessageServiceImpl implements MessageService {
     public String apiChatBoxGeminiPro;
 
     @Override
-    public List<MessageDto> getListMessage(){
+    public List<MessageDto> getListMessage(Integer type){
         CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
 
-        List<MessageDto> messageDtoList = messageRepository.getAllByCreator(customerDetailService.getUsername())
+        List<MessageDto> messageDtoList = messageRepository.getAllByCreatorAndType(customerDetailService.getUsername(),type)
                 .stream()
                 .map(e -> modelMapper.map(e, MessageDto.class))
                 .collect(Collectors.toList());
@@ -133,7 +133,7 @@ public class MessageServiceImpl implements MessageService {
                         .completionsId(chatBoxResponse.getId())
                         .roleChoices(message.getMessage().getRole())
                         .creator(customerDetailService.getUsername())
-                        .type(0)
+                        .type(chatBoxRequest.getType())
                         .build();
                 this.messageRepository.save(messageEntity);
             }
@@ -145,6 +145,39 @@ public class MessageServiceImpl implements MessageService {
             e.printStackTrace();
         }
 
+
+        return new ServiceResult<>( null ,HttpStatus.OK,"Thất bại");
+    }
+
+    @Override
+    public ServiceResult<ChatBoxResponse> saveMessageRestTemplate1(ChatBoxRequest chatBoxRequest){
+        ServiceResult serviceResult = new ServiceResult<>();
+        DefaultResponse<ResultApiChatBox> response = chatBoxService.chatBoxCallRestTemplate(chatBoxRequest, apiChatBox,tokenCompletions);
+
+        CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        if(response.getSuccess() != 200){
+            serviceResult.setStatus(HttpStatus.BAD_REQUEST);
+            serviceResult.setCode(Constants.CODE_FAIL);
+            serviceResult.setMessage("Call api chat box thất bại");
+            return serviceResult;
+        }
+
+        try {
+            JSONObject jsonContent1 = response.getData().getJsonObject();
+
+            Gson gson = new Gson();
+            ChatBoxResponse chatBoxResponse = gson.fromJson(jsonContent1.toString(), ChatBoxResponse.class);
+
+            return new ServiceResult<>( chatBoxResponse,HttpStatus.OK,"Thành công");
+
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return new ServiceResult<>( null ,HttpStatus.OK,"Thất bại");
     }
@@ -212,7 +245,7 @@ public class MessageServiceImpl implements MessageService {
         try {
 
             JSONObject jsonContent1 = response.getData().getJsonObject();
-            JSONArray candidates = jsonContent1.getJSONArray("candidates");
+            JSONArray candidates =  jsonContent1.getJSONArray("candidates");
             JSONObject candidate = candidates.getJSONObject(0);
             JSONObject content = candidate.getJSONObject("content");
             JSONArray parts = content.getJSONArray("parts");

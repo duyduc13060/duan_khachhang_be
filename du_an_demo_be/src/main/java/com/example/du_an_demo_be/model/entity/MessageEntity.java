@@ -39,6 +39,6 @@ public class MessageEntity {
 
     private String creator;
 
-    private Integer type; // 0: api completions; 1 : api amazon
+    private Integer type;
 
 }

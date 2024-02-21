@@ -13,6 +13,7 @@ public  class ChatBoxRequest {
 
     private String model;
     private List<Messages> messages;
+    private Integer type;
 //    private boolean stream;
 
 

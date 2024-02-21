@@ -1,6 +1,11 @@
 package com.example.du_an_demo_be.service.elasticsearch;
 
+import com.example.du_an_demo_be.model.dto.ElasticSearchDto;
+import com.example.du_an_demo_be.model.dto.UserDto;
 import com.example.du_an_demo_be.model.entity.VectorEntity;
+import com.example.du_an_demo_be.payload.request.SearchDTO;
+import com.example.du_an_demo_be.payload.response.ServiceResult;
+import org.springframework.data.domain.Page;
 import org.springframework.data.elasticsearch.core.IndexedObjectInformation;
 
 import java.util.List;
@@ -17,7 +22,9 @@ public interface VectorSearchService {
 
     void deleteDocumentIndex();
 
-    List<VectorEntity> searchPassageRetrieval(final String query);
+    ServiceResult<Page<VectorEntity>> searchPassageRetrieval(SearchDTO<ElasticSearchDto> searchDTO);
 
     String getFileContent(String fileName);
+
+    void deleteByFileName(String fileName);
 }
