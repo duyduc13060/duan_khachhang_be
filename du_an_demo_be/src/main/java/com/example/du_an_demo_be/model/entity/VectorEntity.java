@@ -18,6 +18,9 @@ public class VectorEntity {
     @Field(type = FieldType.Text, name = "content")
     private String content;
 
+    @Field(type = FieldType.Text, name = "full_content")
+    private String fullContent;
+
     @Field(type = FieldType.Text, name = "file_name")
     private String fileName;
 

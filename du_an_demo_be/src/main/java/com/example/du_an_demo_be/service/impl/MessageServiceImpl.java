@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,13 +52,16 @@ public class MessageServiceImpl implements MessageService {
     public String apiChatBoxGeminiPro;
 
     @Override
-    public List<MessageDto> getListMessage(Integer type){
+    public List<MessageDto> getListMessage(Integer type) {
         CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
 
-        List<MessageDto> messageDtoList = messageRepository.getAllByCreatorAndType(customerDetailService.getUsername(),type)
+        List<MessageDto> messageDtoList = messageRepository.findTop50ByCreatorAndTypeOrderByCreateTimeDesc(customerDetailService.getUsername(), type)
                 .stream()
                 .map(e -> modelMapper.map(e, MessageDto.class))
                 .collect(Collectors.toList());
+
+        // Đảo ngược thứ tự của list để có thứ tự create_time tăng dần
+        Collections.reverse(messageDtoList);
 
         return messageDtoList;
     }
@@ -145,6 +149,39 @@ public class MessageServiceImpl implements MessageService {
             e.printStackTrace();
         }
 
+
+        return new ServiceResult<>( null ,HttpStatus.OK,"Thất bại");
+    }
+
+    @Override
+    public ServiceResult<ChatBoxResponse> saveMessageRestTemplate1(ChatBoxRequest chatBoxRequest){
+        ServiceResult serviceResult = new ServiceResult<>();
+        DefaultResponse<ResultApiChatBox> response = chatBoxService.chatBoxCallRestTemplate(chatBoxRequest, apiChatBox,tokenCompletions);
+
+        CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        if(response.getSuccess() != 200){
+            serviceResult.setStatus(HttpStatus.BAD_REQUEST);
+            serviceResult.setCode(Constants.CODE_FAIL);
+            serviceResult.setMessage("Call api chat box thất bại");
+            return serviceResult;
+        }
+
+        try {
+            JSONObject jsonContent1 = response.getData().getJsonObject();
+
+            Gson gson = new Gson();
+            ChatBoxResponse chatBoxResponse = gson.fromJson(jsonContent1.toString(), ChatBoxResponse.class);
+
+            return new ServiceResult<>( chatBoxResponse,HttpStatus.OK,"Thành công");
+
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return new ServiceResult<>( null ,HttpStatus.OK,"Thất bại");
     }

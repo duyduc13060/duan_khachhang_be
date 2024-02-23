@@ -80,7 +80,8 @@ public class VectorSearchServiceImpl implements VectorSearchService {
         AtomicInteger count = new AtomicInteger(1);
         CustomerDetailService customer = CurrentUserUtils.getCurrentUserUtils();
 
-        trunks.forEach(item ->{
+        for (int i = 0; i < trunks.size(); i++) {
+            String item = trunks.get(i);
             VectorEntity vectorEntities = new VectorEntity();
             vectorEntities.setId("vector_" +
                     Calendar.getInstance().get(Calendar.YEAR) +
@@ -92,8 +93,17 @@ public class VectorSearchServiceImpl implements VectorSearchService {
                     Calendar.getInstance().get(Calendar.MILLISECOND));
             vectorEntities.setContent(item);
             vectorEntities.setFileName(fileName);
-            vectorEntities.setTrunkCount(count.intValue());
+            vectorEntities.setTrunkCount(count.get());
             vectorEntities.setCreator(customer.getUsername());
+
+            // Điều chỉnh nội dung dựa trên giá trị của count
+            if (count.get() == 1) {
+                vectorEntities.setFullContent(item);
+            } else {
+                String prevItem = i > 0 ? trunks.get(i - 1) : "";
+                String nextItem = i < trunks.size() - 1 ? trunks.get(i + 1) : "";
+                vectorEntities.setFullContent(prevItem + item + nextItem);
+            }
 
             IndexQuery indexQuery = new IndexQueryBuilder()
                     .withId(vectorEntities.getId())
@@ -103,9 +113,8 @@ public class VectorSearchServiceImpl implements VectorSearchService {
                     .index(indexQuery, IndexCoordinates.of(MESSAGE_INDEX));
 
             documentIds.add(documentId);
-            count.getAndIncrement();
-
-        });
+            count.incrementAndGet();
+        }
         return documentIds;
     }
 
@@ -166,29 +175,29 @@ public class VectorSearchServiceImpl implements VectorSearchService {
 
         // 3. Map searchHits to product list
         List<VectorEntity> productMatches = new ArrayList<VectorEntity>();
-        productMatches.add(productHits.getSearchHit(0).getContent());
-        int trunkCount = productHits.getSearchHit(0).getContent().getTrunkCount();
-
-        for (int i = 1; i < productHits.getSearchHits().size(); i++) {
-            VectorEntity vectorEntity = productHits.getSearchHit(i).getContent();
-            if (trunkCount == 1 && vectorEntity.getTrunkCount() == 2) {
-                productMatches.add(vectorEntity);
-                break;
-            } else if (trunkCount > 1 && (vectorEntity.getTrunkCount() == trunkCount - 1 || vectorEntity.getTrunkCount() == trunkCount + 1)) {
-                productMatches.add(vectorEntity);
-                if (productMatches.size() == 3) {
-                    break;
-                }
-            }
-        }
-
-//        int i = 0;
-//        for (SearchHit<VectorEntity> searchHit : productHits) {
-//            productMatches.add(searchHit.getContent());
-//            if (productMatches.size() > 10) {
+//        productMatches.add(productHits.getSearchHit(0).getContent());
+//        int trunkCount = productHits.getSearchHit(0).getContent().getTrunkCount();
+//
+//        for (int i = 1; i < productHits.getSearchHits().size(); i++) {
+//            VectorEntity vectorEntity = productHits.getSearchHit(i).getContent();
+//            if (trunkCount == 1 && vectorEntity.getTrunkCount() == 2) {
+//                productMatches.add(vectorEntity);
 //                break;
+//            } else if (trunkCount > 1 && (vectorEntity.getTrunkCount() == trunkCount - 1 || vectorEntity.getTrunkCount() == trunkCount + 1)) {
+//                productMatches.add(vectorEntity);
+//                if (productMatches.size() == 3) {
+//                    break;
+//                }
 //            }
 //        }
+
+        int i = 0;
+        for (SearchHit<VectorEntity> searchHit : productHits) {
+            productMatches.add(searchHit.getContent());
+            if (productMatches.size() > 9) {
+                break;
+            }
+        }
         return productMatches;
     }
 

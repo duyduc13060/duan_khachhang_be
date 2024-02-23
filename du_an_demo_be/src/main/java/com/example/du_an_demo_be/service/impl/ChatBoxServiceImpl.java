@@ -97,15 +97,12 @@ public class ChatBoxServiceImpl implements ChatBoxService {
         DefaultResponse<ResultApiChatBox> resultApiChatBoxDefaultResponse = new DefaultResponse<>();
         ResultApiChatBox resultApiChatBox = new ResultApiChatBox();
 
-//        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-//
-//        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.53.120.10", 8080));
-//        requestFactory.setProxy(proxy);
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 
-//        RestTemplate restTemplate = new RestTemplate(requestFactory);
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.53.120.10", 8080));
+        requestFactory.setProxy(proxy);
 
-          RestTemplate restTemplate = new RestTemplate();
-
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
 
 //          RestTemplate restTemplate = new RestTemplate();
 
