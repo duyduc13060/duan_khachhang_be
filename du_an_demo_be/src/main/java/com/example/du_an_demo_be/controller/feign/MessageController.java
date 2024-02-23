@@ -35,12 +35,6 @@ public class MessageController {
     }
 
 
-    @PostMapping("/generate-message1")
-    public ResponseEntity<?> sendMessage1(@RequestBody ChatBoxRequest chatBoxRequest){
-        return   ResponseEntity.ok().body(messageService.saveMessageRestTemplate1(chatBoxRequest));
-    }
-
-
     //Todo:
     @PostMapping("/generate-message-amazon")
     public ResponseEntity<?> sendMessage(@RequestBody ChatBoxAmazonRequest chatBoxRequest){

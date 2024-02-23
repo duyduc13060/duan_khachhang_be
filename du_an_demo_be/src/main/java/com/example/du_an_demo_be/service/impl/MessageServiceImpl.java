@@ -150,39 +150,6 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public ServiceResult<ChatBoxResponse> saveMessageRestTemplate1(ChatBoxRequest chatBoxRequest){
-        ServiceResult serviceResult = new ServiceResult<>();
-        DefaultResponse<ResultApiChatBox> response = chatBoxService.chatBoxCallRestTemplate(chatBoxRequest, apiChatBox,tokenCompletions);
-
-        CustomerDetailService customerDetailService = CurrentUserUtils.getCurrentUserUtils();
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-        if(response.getSuccess() != 200){
-            serviceResult.setStatus(HttpStatus.BAD_REQUEST);
-            serviceResult.setCode(Constants.CODE_FAIL);
-            serviceResult.setMessage("Call api chat box thất bại");
-            return serviceResult;
-        }
-
-        try {
-            JSONObject jsonContent1 = response.getData().getJsonObject();
-
-            Gson gson = new Gson();
-            ChatBoxResponse chatBoxResponse = gson.fromJson(jsonContent1.toString(), ChatBoxResponse.class);
-
-            return new ServiceResult<>( chatBoxResponse,HttpStatus.OK,"Thành công");
-
-        } catch (JsonSyntaxException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return new ServiceResult<>( null ,HttpStatus.OK,"Thất bại");
-    }
-
-    @Override
     public ServiceResult<ChatBoxAmazonResponse> saveMessageChatBoxAmazon(ChatBoxAmazonRequest chatBoxRequest){
         ServiceResult serviceResult = new ServiceResult<>();
 //        DefaultResponse<ResultApiChatBox> response = chatBoxService.chatBoxAmazon(chatBoxRequest, apiChatBoxAmazon);
