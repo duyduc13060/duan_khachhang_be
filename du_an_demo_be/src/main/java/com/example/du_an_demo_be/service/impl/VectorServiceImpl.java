@@ -123,7 +123,7 @@ public class VectorServiceImpl implements VectorService {
 //    }
 
     @Override
-    public String uploadFile(MultipartFile file){
+    public String uploadFile(MultipartFile file, String documentGroup){
         try {
             String content = "";
             InputStream inputStream = file.getInputStream();
@@ -151,7 +151,7 @@ public class VectorServiceImpl implements VectorService {
 
             if(!content.isEmpty() || content != null){
                 //todo: lưu data trong file vào vector
-                this.vectorSearchService.createProductIndex(content, fileName);
+                this.vectorSearchService.createProductIndex(content, fileName, documentGroup);
             }else{
                 throw new BadRequestException("Content is null");
             }

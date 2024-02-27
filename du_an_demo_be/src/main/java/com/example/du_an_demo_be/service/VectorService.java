@@ -12,7 +12,7 @@ public interface VectorService {
 //
 //    void processAndSaveVectorsNew(String doc);
 
-    String uploadFile(MultipartFile file);
+    String uploadFile(MultipartFile file, String documentGroup);
 
 //    List<VectorEntity> processSearch(String query);
 }

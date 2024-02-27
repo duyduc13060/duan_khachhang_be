@@ -31,10 +31,12 @@ public class VectorController {
 
     @PostMapping("/import/upload")
     public ResponseEntity<String> handleFileUpload(
-            @RequestParam("file") MultipartFile file
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("documentGroup") String documentGroup
     ) {
         try {
-            return ResponseEntity.ok().body(this.vectorService.uploadFile(file));
+            System.out.println("Document Group: " + documentGroup);
+            return ResponseEntity.ok().body(this.vectorService.uploadFile(file, documentGroup));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Lỗi khi xử lý file");
@@ -50,7 +52,7 @@ public class VectorController {
 
     @DeleteMapping("/delete/message_index")
     public ResponseEntity<?> deleteDocument() {
-        vectorSearchService.deleteDocumentIndex();
+        vectorSearchService.deleteAllIndex();
         return ResponseEntity.ok().body("Xóa thành công");
     }
 
@@ -69,7 +71,7 @@ public class VectorController {
     public ResponseEntity<?> searchCreator(
             @RequestBody SearchDTO<ElasticSearchDto> searchDTO
     ){
-        return ResponseEntity.ok().body(this.vectorSearchService.searchPassageRetrieval(searchDTO));
+        return ResponseEntity.ok().body(this.vectorSearchService.getAllDocumentInfor(searchDTO));
     }
 
     @DeleteMapping("/delete/vector/filename")

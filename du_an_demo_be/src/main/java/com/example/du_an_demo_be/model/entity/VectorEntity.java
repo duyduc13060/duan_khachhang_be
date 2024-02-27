@@ -30,6 +30,9 @@ public class VectorEntity {
     @Field(type = FieldType.Text, name = "creator")
     private String creator;
 
+    @Field(type = FieldType.Text, name = "document_group")
+    private String documentGroup;
+
     public VectorEntity() {
     }
 

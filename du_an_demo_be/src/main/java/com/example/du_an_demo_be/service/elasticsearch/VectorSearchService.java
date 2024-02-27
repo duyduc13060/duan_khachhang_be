@@ -14,15 +14,15 @@ public interface VectorSearchService {
     List<IndexedObjectInformation> createProductIndexBulk
             (String content);
 
-    List<String> createProductIndex(String content, String fileName);
+    List<String> createProductIndex(String content, String fileName, String documentGroup);
 
     List<String> fetchSuggestions(String query);
 
     List<VectorEntity> processSearch(String query);
 
-    void deleteDocumentIndex();
+    void deleteAllIndex();
 
-    ServiceResult<Page<VectorEntity>> searchPassageRetrieval(SearchDTO<ElasticSearchDto> searchDTO);
+    ServiceResult<Page<VectorEntity>> getAllDocumentInfor(SearchDTO<ElasticSearchDto> searchDTO);
 
     String getFileContent(String fileName);
 

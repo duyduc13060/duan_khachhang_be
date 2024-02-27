@@ -9,6 +9,10 @@ import com.example.du_an_demo_be.security.CustomerDetailService;
 import com.example.du_an_demo_be.service.elasticsearch.VectorSearchService;
 import com.example.du_an_demo_be.until.CurrentUserUtils;
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -38,6 +42,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
 
     private final ElasticsearchVectorRepository elasticsearchVectorRepository;
     private final ElasticsearchOperations elasticsearchOperations;
+    private final RestHighLevelClient client;
     private static final String MESSAGE_INDEX = "message_index";
     private static final int TRUNK_SIZE = 500;
 
@@ -74,7 +79,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
     }
 
     @Override
-    public List<String> createProductIndex(String content, String fileName) {
+    public List<String> createProductIndex(String content, String fileName, String documentGroup) {
         List<String> trunks = this.splitIntoTrunks1(content, TRUNK_SIZE);
         List<String> documentIds = new ArrayList<>();
         AtomicInteger count = new AtomicInteger(1);
@@ -95,6 +100,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
             vectorEntities.setFileName(fileName);
             vectorEntities.setTrunkCount(count.get());
             vectorEntities.setCreator(customer.getUsername());
+            vectorEntities.setDocumentGroup(documentGroup);
 
             // Điều chỉnh nội dung dựa trên giá trị của count
             if (count.get() == 1) {
@@ -110,7 +116,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
                     .withObject(vectorEntities).build();
 
             String documentId = elasticsearchOperations
-                    .index(indexQuery, IndexCoordinates.of(MESSAGE_INDEX));
+                    .index(indexQuery, IndexCoordinates.of(documentGroup));
 
             documentIds.add(documentId);
             count.incrementAndGet();
@@ -171,7 +177,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
         SearchHits<VectorEntity> productHits =
                 elasticsearchOperations
                         .search(searchQuery, VectorEntity.class,
-                                IndexCoordinates.of(MESSAGE_INDEX));
+                                IndexCoordinates.of("*"));
 
         // 3. Map searchHits to product list
         List<VectorEntity> productMatches = new ArrayList<VectorEntity>();
@@ -202,7 +208,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
     }
 
     @Override
-    public ServiceResult<Page<VectorEntity>> searchPassageRetrieval(SearchDTO<ElasticSearchDto> searchDTO) {
+    public ServiceResult<Page<VectorEntity>> getAllDocumentInfor(SearchDTO<ElasticSearchDto> searchDTO) {
         // 1. Tạo truy vấn tìm kiếm các đoạn văn phù hợp với truy vấn
         QueryBuilder queryBuilder = QueryBuilders
                 .multiMatchQuery(searchDTO.getData().getCreator(),  "creator")
@@ -222,7 +228,7 @@ public class VectorSearchServiceImpl implements VectorSearchService {
         SearchHits<VectorEntity> searchHits =
                 elasticsearchOperations
                         .search(searchQuery, VectorEntity.class,
-                                IndexCoordinates.of(MESSAGE_INDEX));
+                                IndexCoordinates.of("*"));
 
         Map<String, VectorEntity> resultMap = new HashMap<>();
         for (SearchHit<VectorEntity> searchHit : searchHits) {
@@ -295,11 +301,15 @@ public class VectorSearchServiceImpl implements VectorSearchService {
         return fileContent.toString();
     }
 
-    public void deleteDocumentIndex() {
+    public void deleteAllIndex() {
         try {
-            IndexOperations indexOperations = elasticsearchOperations.indexOps(IndexCoordinates.of(MESSAGE_INDEX));
-            indexOperations.delete();
-            System.out.println("Ducuments index deleted!");
+            DeleteIndexRequest request = new DeleteIndexRequest("_all");
+            AcknowledgedResponse deleteIndexResponse = client.indices().delete(request, RequestOptions.DEFAULT);
+            if (deleteIndexResponse.isAcknowledged()) {
+                System.out.println("All indices have been deleted!");
+            } else {
+                System.out.println("Index deletion was not acknowledged.");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
